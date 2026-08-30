@@ -62,8 +62,8 @@ values mounted as build secrets, ships it to EC2, and runs it on `127.0.0.1:3006
 First time only:
 
 - DNS `acl` A record → `18.191.96.186`
-- host nginx vhost `acl.brbcoffee-atx.com` → `127.0.0.1:3006`
-- `certbot --nginx -d acl.brbcoffee-atx.com`
+- add the block from [deploy/Caddyfile.snippet](deploy/Caddyfile.snippet) to the box's Caddyfile
+  and `sudo systemctl reload caddy` — Caddy issues and renews TLS itself, no certbot
 - GitHub secrets: six `FIREBASE_*`, `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`
   (optional `EC2_SSH_PORT`, `EC2_HOST_KEY`)
 - Firebase: enable email-link sign-in, add the subdomain to authorized domains

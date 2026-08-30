@@ -200,7 +200,7 @@ match /aclDropLog/{id} {
 - **3 — Assignments.** Layer toggle, admin assigns, conflict detection, volunteer drop + drop log.
 - **4 — Admin panel.** Roster, invites, lock, coverage summary, CSV export.
 - **5 — Station tab.** The map component driven by real assignments, own-shift default, position highlight. Briefing copy as a constants module.
-- **6 — Deploy.** DNS, nginx vhost, certbot, first green Actions run.
+- **6 — Deploy.** DNS A record, Caddy block, first green Actions run.
 
 ---
 
@@ -208,8 +208,8 @@ match /aclDropLog/{id} {
 
 - DNS: `acl` A record → `18.191.96.186`
 - Confirm 3006 is free on the box (`docker ps` — 3001 is brb-baristas, 3005 is brb-schedule)
-- Host nginx vhost: `acl.brbcoffee-atx.com` → `127.0.0.1:3006`
-- `certbot --nginx -d acl.brbcoffee-atx.com`
+- Caddy block: `acl.brbcoffee-atx.com { reverse_proxy 127.0.0.1:3006 }`, then reload caddy
+  (the box uses Caddy as the host proxy — it issues TLS itself, no certbot)
 - GitHub secrets: same set as brb-schedule (6× `FIREBASE_*`, `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`, optional `EC2_SSH_PORT` / `EC2_HOST_KEY`)
 - Firebase: authorized domain + email-link provider (see above)
 - Merge and deploy `firestore.rules`

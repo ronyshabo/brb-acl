@@ -18,4 +18,9 @@ Before the first deploy, in the Firebase console:
   3. Firestore > create aclAdmins/{your-uid} so you get the admin tabs
   4. MERGE firestore.rules into the project rules before deploying them
 
+Host reverse proxy is CADDY, not nginx. Add deploy/Caddyfile.snippet to
+/etc/caddy/Caddyfile and reload — Caddy handles TLS itself, no certbot.
+
+Admin SSH is on port 2222. Port 22 is brb-tui (Charm Wish, Go).
+
 See README.md for the full deploy path.

@@ -1,0 +1,14 @@
+# Add to the Caddyfile on the EC2 box (usually /etc/caddy/Caddyfile),
+# alongside the other brbcoffee-atx.com blocks.
+#
+# Caddy provisions and renews the TLS certificate itself — there is no
+# certbot step. It needs port 80 reachable from the internet to complete
+# the ACME challenge, and the DNS A record must already resolve.
+#
+#   sudo nano /etc/caddy/Caddyfile
+#   sudo caddy validate --config /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+
+acl.brbcoffee-atx.com {
+  reverse_proxy 127.0.0.1:3006
+}
