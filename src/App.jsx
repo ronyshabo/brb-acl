@@ -108,7 +108,7 @@ export default function App() {
     <div className="app">
       <nav className="topbar">
         <div className="brand">
-          <span className="mark">BRB</span>
+          <span className="mark">BRB Coffee</span>
           <span className="ctx">ACL Volunteers</span>
         </div>
         <div className="tabs">
