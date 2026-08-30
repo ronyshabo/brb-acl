@@ -1,15 +1,36 @@
-import { DAYS, SHIFTS, slotId, POSITIONS } from '../constants/schedule'
+import { DAYS, SHIFTS, POSITIONS, HEADCOUNT, slotId } from '../constants/schedule'
 
 /**
- * The six fest days, grouped by weekend. Dots show whether the viewer is on
- * that day's shifts — a volunteer's at-a-glance answer to "when am I working?"
+ * The six fest days, grouped by weekend. Each day carries two dots, one per
+ * shift. What they encode depends on who's looking:
+ *
+ *   volunteer → solid when they're on that shift
+ *   admin     → solid when all four positions are filled, half when partly
+ *               staffed, hollow when nobody is on
+ *
+ * An admin isn't usually on the roster, so keying the dots to "your shifts"
+ * left them permanently empty and unexplained.
  */
 export default function FestCalendar({ assignments, me, focusDate, onPick }) {
-  const myShifts = (date) =>
-    SHIFTS.filter((s) => {
-      const row = assignments[slotId(date, s.id)] || {}
-      return me && POSITIONS.some((p) => row[p.id] === me.id)
-    })
+  const stateFor = (date, shiftId) => {
+    const row = assignments[slotId(date, shiftId)] || {}
+    const filled = POSITIONS.filter((p) => row[p.id]).length
+    const mine = !!me && POSITIONS.some((p) => row[p.id] === me.id)
+    return { filled, mine }
+  }
+
+  const dotClass = ({ filled, mine }, shift) => {
+    const base = `dot ${shift.id === '12-17' ? 'day' : 'night'}`
+    if (me) return mine ? `${base} on` : base
+    if (filled >= HEADCOUNT) return `${base} on`
+    if (filled > 0) return `${base} partial`
+    return base
+  }
+
+  const dotTitle = ({ filled, mine }, shift) =>
+    me
+      ? `${shift.label} — ${mine ? 'you’re on this shift' : 'not on this shift'}`
+      : `${shift.label} — ${filled} of ${HEADCOUNT} positions filled`
 
   return (
     <div className="panel calendar">
@@ -19,23 +40,21 @@ export default function FestCalendar({ assignments, me, focusDate, onPick }) {
           <span className="wklabel">Weekend {wk}</span>
           <div className="days">
             {DAYS.filter((d) => d.weekend === wk).map((d) => {
-              const mine = myShifts(d.date)
+              const states = SHIFTS.map((s) => stateFor(d.date, s.id))
+              const highlight = me
+                ? states.some((s) => s.mine)
+                : states.every((s) => s.filled >= HEADCOUNT)
               return (
                 <button
                   key={d.date}
-                  className={`day ${focusDate === d.date ? 'focus' : ''} ${mine.length ? 'working' : ''}`}
+                  className={`day ${focusDate === d.date ? 'focus' : ''} ${highlight ? 'working' : ''}`}
                   onClick={() => onPick(focusDate === d.date ? null : d.date)}
                 >
                   <span className="dow">{d.dow}</span>
                   <span className="num">{d.short.split('/')[1]}</span>
                   <span className="dots">
-                    {SHIFTS.map((s) => (
-                      <i
-                        key={s.id}
-                        className={`dot ${s.id === '12-17' ? 'day' : 'night'} ${
-                          mine.some((m) => m.id === s.id) ? 'on' : ''
-                        }`}
-                      />
+                    {SHIFTS.map((s, i) => (
+                      <i key={s.id} className={dotClass(states[i], s)} title={dotTitle(states[i], s)} />
                     ))}
                   </span>
                 </button>
@@ -44,7 +63,13 @@ export default function FestCalendar({ assignments, me, focusDate, onPick }) {
           </div>
         </div>
       ))}
-      {me && <p className="calnote">Filled dots are shifts you’re on.</p>}
+
+      {/* Always rendered — an unexplained dot is worse than no dot. */}
+      <p className="calnote">
+        {me
+          ? 'Two dots per day — the 12–5 and 5–10 shifts. Solid means you’re on it.'
+          : 'Two dots per day — the 12–5 and 5–10 shifts. Solid when all 4 positions are filled, half when short.'}
+      </p>
     </div>
   )
 }
