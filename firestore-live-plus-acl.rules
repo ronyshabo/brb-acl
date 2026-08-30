@@ -224,11 +224,6 @@ service cloud.firestore {
             && dropOk('back-left')  && dropOk('back-right'));
     }
 
-    match /aclMenu/{itemId} {
-      allow read: if isSignedIn();
-      allow write: if isAclAdmin();
-    }
-
     match /aclDropLog/{id} {
       allow read: if isAclAdmin();
       allow create: if isSignedIn()

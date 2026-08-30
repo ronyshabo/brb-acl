@@ -110,25 +110,34 @@ export async function dropPosition(slot, positionId, volunteerId, reason = '') {
 
 /* ── menu ───────────────────────────────────────────────────────────────── */
 
+/**
+ * The menu lives as an array on aclConfig/settings rather than in its own
+ * collection. It is 6-8 items that only admins edit, aclConfig already has
+ * exactly the rules a menu needs (signed-in read, admin write), and a separate
+ * collection would mean publishing new rules for no benefit.
+ *
+ * The trade-off is that a save rewrites the whole array, so two admins editing
+ * at the same moment can overwrite each other. With two or three admins and a
+ * handful of items that is not worth defending against.
+ */
 export const watchMenu = (cb, onError) =>
   onSnapshot(
-    collection(db, 'aclMenu'),
-    (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    doc(db, 'aclConfig', 'settings'),
+    (d) => cb(d.exists() ? d.data().menu || [] : []),
     onError
   )
 
-export async function saveMenuItem(item) {
-  const { id, ...data } = item
-  const payload = { ...data, updatedAt: serverTimestamp() }
-  if (id) {
-    await setDoc(doc(db, 'aclMenu', id), payload, { merge: true })
-    return id
-  }
-  const ref = await addDoc(collection(db, 'aclMenu'), payload)
-  return ref.id
+export async function saveMenu(items) {
+  await setDoc(
+    doc(db, 'aclConfig', 'settings'),
+    { menu: items, menuUpdatedAt: serverTimestamp() },
+    { merge: true }
+  )
 }
 
-export const removeMenuItem = (id) => deleteDoc(doc(db, 'aclMenu', id))
+/** Stable local id — the array has no document ids to lean on. */
+export const newMenuId = () =>
+  (globalThis.crypto?.randomUUID?.() || `m${Date.now()}${Math.random().toString(36).slice(2, 7)}`)
 
 /* ── roster ─────────────────────────────────────────────────────────────── */
 

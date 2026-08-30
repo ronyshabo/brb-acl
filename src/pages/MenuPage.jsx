@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { watchMenu, saveMenuItem, removeMenuItem } from '../firebase/data'
+import { watchMenu, saveMenu, newMenuId } from '../firebase/data'
 import { MENU_CATEGORIES, categoryLabel, emptyItem } from '../constants/menu'
 import '../styles/menu.css'
 
@@ -38,7 +38,11 @@ export default function MenuPage({ isAdmin }) {
     e.preventDefault()
     setBusy(true)
     try {
-      await saveMenuItem(editing)
+      const item = editing.id ? editing : { ...editing, id: newMenuId() }
+      const next = items.some((i) => i.id === item.id)
+        ? items.map((i) => (i.id === item.id ? item : i))
+        : [...items, item]
+      await saveMenu(next)
       setEditing(null)
     } catch (err) {
       setError(err)
@@ -49,7 +53,14 @@ export default function MenuPage({ isAdmin }) {
 
   async function remove(item) {
     if (!window.confirm(`Remove "${item.name}" from the menu?`)) return
-    await removeMenuItem(item.id)
+    setBusy(true)
+    try {
+      await saveMenu(items.filter((i) => i.id !== item.id))
+    } catch (err) {
+      setError(err)
+    } finally {
+      setBusy(false)
+    }
   }
 
   if (error) {
@@ -60,7 +71,7 @@ export default function MenuPage({ isAdmin }) {
           <p>
             Firestore refused the read
             {error.code === 'permission-denied'
-              ? ' — the aclMenu rules aren’t deployed yet.'
+              ? ' — check you’re signed in as an admin.'
               : `: ${error.code || 'unknown error'}.`}
           </p>
         </div>

@@ -1,5 +1,6 @@
-// Menu items live in Firestore (aclMenu) because the admin edits them, but the
-// categories are fixed so the tab always groups the same way.
+// Menu items are stored as an array on aclConfig/settings, which already has
+// the rules a menu needs. Categories are fixed here so the tab always groups
+// the same way.
 
 export const MENU_CATEGORIES = [
   { id: 'espresso', label: 'Espresso' },
