@@ -1,0 +1,239 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        request.auth.token.email in ["brbcafeatx@gmail.com"]
+      );
+    }
+
+    function isRegisteredBarista() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/scheduleUsers/$(request.auth.uid));
+    }
+
+    function isValidRedeemUpdate(before, after) {
+      return after.keys().hasOnly(before.keys())
+        && after.phone == before.phone
+        && after.name == before.name
+        && after.type == before.type
+        && after.drinksRemaining == before.drinksRemaining - 1
+        && after.drinksRemaining >= 0
+        && after.drinksToday >= 1
+        && after.drinksToday <= 3;
+    }
+
+    match /bands/{id} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.email == request.auth.token.email ||
+        isAdmin()
+      );
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.email == request.auth.token.email ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /admins/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isAdmin();
+    }
+
+    match /events/{id} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    match /bookings/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /invitations/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /tipReports/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /images/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /posts/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /drinks/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /favoritePlaces/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /communityPosters/{id} {
+      allow read: if resource.data.approved == true;
+      allow write: if isAdmin();
+    }
+
+    match /instagramPosts/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /pressFeatures/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /subscribers/{id} {
+      allow get: if true;
+      allow list: if request.query.limit != null && request.query.limit <= 1;
+      allow update: if (!isSignedIn() && isValidRedeemUpdate(resource.data, request.resource.data))
+                    || isAdmin();
+      allow create, delete: if isAdmin();
+    }
+
+    match /baristas/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+      allow update: if isSignedIn()
+        && !('uid' in resource.data)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['uid', 'email', 'linkedAt']);
+    }
+
+    match /scheduleUsers/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && userId == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn() && userId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    match /schedules/{scheduleId} {
+      allow read: if isRegisteredBarista() || isAdmin();
+      allow create: if isRegisteredBarista()
+        && request.resource.data.baristaId == request.auth.uid
+        && request.resource.data.shiftType in ['opening', 'closing', 'shared']
+        && request.resource.data.status == 'confirmed';
+      allow update: if (isRegisteredBarista()
+        && resource.data.baristaId == request.auth.uid
+        && request.resource.data.baristaId == request.auth.uid)
+        || isAdmin();
+      allow delete: if (isRegisteredBarista()
+        && resource.data.baristaId == request.auth.uid)
+        || isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    match /baristas/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow update: if isSignedIn()
+        && !('uid' in resource.data)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['uid', 'email', 'linkedAt']);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // BEGIN brb-acl — acl.brbcoffee-atx.com
+    // Added 2026-08-30 for the ACL Fest volunteer portal.
+    // Everything above this line is untouched. To retire the fest app, delete
+    // from this line down to "END brb-acl" and republish. Nothing else depends
+    // on it.
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function isAclAdmin() {
+      return isAdmin()
+          || (isSignedIn()
+              && exists(/databases/$(database)/documents/aclAdmins/$(request.auth.uid)));
+    }
+
+    // A volunteer's doc id IS their lowercased email — the app relies on this.
+    function myVolunteerId() {
+      return request.auth.token.email.lower();
+    }
+
+    match /aclAdmins/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;                    // managed from the Firebase console
+    }
+
+    match /aclConfig/{doc} {
+      allow read: if isSignedIn();
+      allow write: if isAclAdmin();
+    }
+
+    match /aclVolunteers/{id} {
+      allow read: if isSignedIn();
+      allow create, delete: if isAclAdmin();
+      allow update: if isAclAdmin()
+        // First-time uid link only, by the person whose email it is.
+        // Check absence before value: reading a missing field errors, and an
+        // erroring rule denies.
+        || ((!('uid' in resource.data) || resource.data.uid == null)
+            && id == myVolunteerId()
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['uid', 'status', 'claimedAt']));
+    }
+
+    match /aclAvailability/{volunteerId} {
+      allow read: if isSignedIn();
+      allow write: if isAclAdmin() || volunteerId == myVolunteerId();
+    }
+
+    match /aclAssignments/{slotId} {
+      // A position is either untouched, or vacated by the person standing in it.
+      function dropOk(k) {
+        return request.resource.data.positions[k] == resource.data.positions[k]
+            || (resource.data.positions[k] == myVolunteerId()
+                && request.resource.data.positions[k] == null);
+      }
+
+      allow read: if isSignedIn();
+      allow create, delete: if isAclAdmin();
+      allow update: if isAclAdmin()
+        // Four fixed keys, enumerated — rules have no loops.
+        || (isSignedIn()
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['positions', 'updatedAt'])
+            && dropOk('front-left') && dropOk('front-right')
+            && dropOk('back-left')  && dropOk('back-right'));
+    }
+
+    match /aclDropLog/{id} {
+      allow read: if isAclAdmin();
+      allow create: if isSignedIn()
+                    && request.resource.data.volunteerId == myVolunteerId();
+      allow update, delete: if false;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // END brb-acl
+    // ═══════════════════════════════════════════════════════════════════════
+
+  }
+}

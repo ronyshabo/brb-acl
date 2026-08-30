@@ -1,19 +1,20 @@
-rules_version = '2';
-
-// ⚠ Firebase allows ONE rules file per project (brb-coffee-dev), and the LIVE
-// rules contain blocks that exist in no repo — bands, events, subscribers,
-// baristas, scheduleUsers, schedules, and an isAdmin() of their own.
+// ─────────────────────────────────────────────────────────────────────────────
+// brb-acl rules — ADDITIVE.
 //
-// DO NOT deploy this file. It is a reference copy of the brb-acl blocks only.
-// To change the live rules, paste firestore-acl-blocks.rules into the console
-// alongside what is already there.
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // These two come from the live rules and are assumed to exist:
-    //   function isSignedIn() { return request.auth != null; }
-    //   function isAdmin()    { ...token.admin, brbcafeatx@gmail.com... }
+// Paste this INSIDE your existing
+//   match /databases/{database}/documents { ... }
+// block. Do not remove anything already there.
+//
+// Reuses your existing isSignedIn() and isAdmin() helpers rather than
+// redefining them — a second isAdmin() in the same scope is a duplicate
+// function error and the deploy would be rejected.
+//
+// isAclAdmin() deliberately ORs two things:
+//   * your existing isAdmin()  → brbcafeatx@gmail.com works immediately,
+//                                no aclAdmins doc needed to bootstrap
+//   * an aclAdmins/{uid} doc   → lets you add fest-only admins later
+//                                without editing rules again
+// ─────────────────────────────────────────────────────────────────────────────
 
     function isAclAdmin() {
       return isAdmin()
@@ -80,6 +81,3 @@ service cloud.firestore {
                     && request.resource.data.volunteerId == myVolunteerId();
       allow update, delete: if false;
     }
-
-  }
-}
