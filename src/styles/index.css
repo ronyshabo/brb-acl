@@ -192,3 +192,36 @@ main {
   padding: 8px 10px; word-break: break-all; margin-bottom: 8px;
   box-shadow: var(--sunken);
 }
+
+/* ── phone ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  body { font-size: 13.5px; }
+  .app { padding: 6px; }
+  main { padding: 10px; }
+
+  /* Brand and account on one line, tabs full-width beneath them. */
+  .topbar { gap: 8px; padding: 8px 10px; }
+  .brand { flex: 1 1 auto; }
+  .brand .mark { font-size: 10px; }
+  .brand .ctx { font-size: 7px; }
+
+  .who { order: 2; font-size: 11px; gap: 7px; }
+  .who span { max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .who button { padding: 6px 9px; }
+
+  .tabs { order: 3; width: 100%; margin-left: 0; gap: 4px; }
+  .tabs a { flex: 1; text-align: center; padding: 9px 4px; font-size: 8px; }
+
+  .panel h3 { font-size: 8px; padding: 6px 9px; }
+  .panel > p, .panel > ul, .panel > form, .panel > table,
+  .panel > .addform, .panel > .formnote, .panel > .panelhead,
+  .panel > .week, .panel > .calnote { margin-left: 10px; margin-right: 10px; }
+
+  .gate h1 { font-size: 12px; }
+  .gate p { font-size: 13px; }
+  .gate .bootstrap { max-width: 100%; }
+
+  /* Comfortable tap targets everywhere. */
+  button { padding: 9px 12px; }
+  input { font-size: 16px; }   /* 16px stops iOS Safari zooming on focus */
+}

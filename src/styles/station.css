@@ -58,3 +58,18 @@ svg.stationmap .seat.clickable:hover .vol { stroke-width: 4; }
   font-family: var(--font-ui); font-size: 12.5px; line-height: 1.6; color: var(--ink);
 }
 .brief li, ul.flow li { margin-bottom: 6px; }
+
+/* ── phone ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .slotnav { gap: 10px; }
+  .slotnav button { width: 44px; height: 44px; }   /* thumb-sized */
+  .slotlabel { min-width: 0; flex: 1; }
+  .slotlabel b { font-size: 12px; }
+
+  .stationlayout { gap: 10px; }
+  .mapwrap { padding: 8px; }
+  svg.stationmap { min-width: 300px; }
+
+  .brief ul, ul.flow { margin: 0 10px; font-size: 12.5px; }
+  .youare { font-size: 12.5px; }
+}

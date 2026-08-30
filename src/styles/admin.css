@@ -26,7 +26,16 @@
 .panelhead h3 { margin: 0 0 10px; flex: 1; }
 .acts { display: flex; gap: 6px; }
 
-table.roster { width: 100%; border-collapse: collapse; font-family: var(--font-ui); font-size: 13px; }
+table.roster {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--font-ui); font-size: 13px;
+  table-layout: fixed;
+}
+table.roster th:nth-child(1), table.roster td:nth-child(1) { width: 22%; }
+table.roster th:nth-child(2), table.roster td:nth-child(2) { width: 32%; }
+table.roster th:nth-child(3), table.roster td:nth-child(3) { width: 14%; }
+table.roster th:nth-child(4), table.roster td:nth-child(4) { width: 32%; }
+table.roster td:nth-child(2) { overflow-wrap: anywhere; }
 table.roster th {
   text-align: left; font-family: var(--font-pixel); font-size: 8px; color: var(--ink);
   background: var(--silver-light); padding: 8px 9px;
@@ -44,8 +53,10 @@ table.roster td.mono { font-family: var(--font-mono); font-size: 12px; color: va
 .pill.invited { background: var(--gold);       color: var(--heading);      border-color: var(--heading); }
 .pill.added   { background: var(--silver-light); color: var(--ink-mute); }
 
-.rowacts { text-align: right; white-space: nowrap; }
-.rowacts button { padding: 5px 9px; font-size: 8px; margin-left: 5px; }
+/* Four actions per row need to wrap rather than shove the columns apart. */
+.rowacts { text-align: right; }
+.rowacts > * { margin: 2px 0 2px 4px; }
+.rowacts button { padding: 5px 8px; font-size: 8px; }
 .rowacts button.danger { color: var(--error-text); }
 
 /* Gmail link styled as a push button, matching the row actions */
@@ -70,4 +81,45 @@ table.roster td.mono { font-family: var(--font-mono); font-size: 12px; color: va
   white-space: pre-wrap; word-wrap: break-word; margin: 0;
   background: var(--warm-glow); border: 2px solid #000; padding: 12px;
   max-height: 320px; overflow-y: auto;
+}
+
+
+/* ── phone ───────────────────────────────────────────────────────────────
+   A four-column table with four buttons per row cannot work at 380px, so
+   each row becomes a stacked card labelled from the th text. */
+@media (max-width: 700px) {
+  .adminpage { gap: 12px; }
+
+  .addform { flex-direction: column; }
+  .addform input, .addform button { width: 100%; }
+
+  .panelhead { flex-wrap: wrap; }
+  .acts { width: 100%; }
+  .acts button { flex: 1; }
+
+  table.roster, table.roster tbody, table.roster tr, table.roster td { display: block; width: 100%; }
+  table.roster thead { display: none; }
+  table.roster { table-layout: auto; }
+
+  table.roster tr {
+    background: var(--window); border: 2px solid #000;
+    margin-bottom: 10px; padding: 4px 0;
+  }
+  table.roster td {
+    display: flex; align-items: baseline; gap: 10px;
+    border-bottom: 1px dotted var(--silver); padding: 7px 10px;
+    width: auto !important;
+  }
+  table.roster tr td:last-child { border-bottom: none; }
+  table.roster td::before {
+    content: attr(data-label);
+    flex: 0 0 62px;
+    font-family: var(--font-pixel); font-size: 7px; color: var(--ink-mute);
+  }
+
+  .rowacts { text-align: left; flex-wrap: wrap; }
+  .rowacts > * { margin: 3px 4px 3px 0; }
+  .rowacts button, .rowacts a.btn { padding: 8px 10px; }   /* thumb-sized */
+
+  .preview pre { font-size: 12px; max-height: 240px; }
 }

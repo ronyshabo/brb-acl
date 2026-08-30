@@ -22,8 +22,17 @@
   overflow: auto; max-height: 70vh;
   background: var(--window); border: 2px solid #000;
 }
-table.grid { border-collapse: separate; border-spacing: 0; width: 100%; }
+/* table-layout:fixed is the fix for cells resizing as you click.
+   With auto layout a cell gaining a check mark widens its column and the
+   whole table reflows; with fixed, content never affects geometry. */
+table.grid {
+  border-collapse: separate; border-spacing: 0;
+  table-layout: fixed; width: max-content; min-width: 100%;
+}
 table.grid th, table.grid td { padding: 0; border-bottom: 1px solid var(--silver); }
+table.grid th.corner, table.grid th.rowhead { width: 118px; }
+table.grid thead th { width: 58px; }
+table.grid th.cover, table.grid td.cover { width: 62px; }
 
 table.grid thead th {
   position: sticky; top: 0; z-index: 3;
@@ -53,7 +62,7 @@ th.rowhead.night span { color: var(--link); }
 tr.weekend-break th, tr.weekend-break td { border-top: 3px solid #000; }
 
 .cell {
-  width: 100%; min-width: 46px; height: 38px;
+  display: block; width: 100%; height: 38px; overflow: hidden;
   border: none; background: transparent;
   font-family: var(--font-mono); font-size: 13px; font-weight: bold;
   color: var(--ink-mute); position: relative; padding: 0;
@@ -123,4 +132,36 @@ td.cover .ok    { color: var(--success-text); }
 .calendar .calnote {
   font-family: var(--font-ui); font-size: 11.5px; line-height: 1.5;
   color: var(--ink-mute); margin-top: 8px;
+}
+
+
+/* ── phone ───────────────────────────────────────────────────────────────
+   Narrower columns and a shorter scroll box so the grid stays usable on a
+   handset without reflowing the layout — the day column stays pinned. */
+@media (max-width: 640px) {
+  .gridpage { gap: 10px; }
+  .grid-scroll { max-height: 62vh; }
+
+  table.grid th.corner, table.grid th.rowhead { width: 92px; }
+  table.grid thead th { width: 50px; }
+  table.grid th.cover, table.grid td.cover { width: 52px; }
+
+  table.grid thead th { font-size: 11px; padding: 7px 4px; }
+  table.grid th.corner { font-size: 7px; }
+  th.rowhead { padding: 6px 7px; }
+  th.rowhead b { font-size: 11.5px; }
+  th.rowhead span { font-size: 10.5px; }
+
+  .cell { height: 42px; font-size: 12px; }   /* taller = easier to tap */
+
+  .layerbar { gap: 8px; }
+  .toggle { flex: 1 1 100%; }
+  .toggle button { flex: 1; padding: 9px 8px; }
+  .layerbar .tip { display: none; }          /* hover hint is meaningless on touch */
+
+  .legend { gap: 8px 12px; font-size: 11.5px; padding: 8px; }
+  .legend .codes { flex-basis: 100%; }
+
+  .calendar .days { gap: 4px; }
+  .calendar .num { font-size: 15px; }
 }

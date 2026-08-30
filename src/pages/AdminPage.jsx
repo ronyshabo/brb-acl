@@ -184,16 +184,16 @@ export default function AdminPage({ volunteers }) {
           <tbody>
             {volunteers.map((v) => (
               <tr key={v.id}>
-                <td>{v.name || <em>—</em>}</td>
-                <td className="mono">{v.id}</td>
-                <td>
+                <td data-label="Name">{v.name || <em>—</em>}</td>
+                <td className="mono" data-label="Email">{v.id}</td>
+                <td data-label="Status">
                   <span className={`pill ${v.status}`}>
                     {v.status === 'active' ? 'signed in'
                       : v.status === 'invited' ? 'invited'
                       : 'not invited'}
                   </span>
                 </td>
-                <td className="rowacts">
+                <td className="rowacts" data-label="Actions">
                   <button onClick={() => copyInvite(v)} title="Copy the invitation text">
                     Copy
                   </button>

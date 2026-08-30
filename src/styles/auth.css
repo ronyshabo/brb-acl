@@ -28,3 +28,10 @@
   color: var(--error-text); background: var(--error-bg);
   border: 2px solid var(--error-border); padding: 8px 10px;
 }
+
+@media (max-width: 640px) {
+  .auth { padding: 12px; }
+  .auth .card { padding-bottom: 18px; }
+  .auth h1 { padding: 0 16px; font-size: 12px; }
+  .auth p, .auth input, .auth button, .auth .error { margin-left: 16px; margin-right: 16px; }
+}
