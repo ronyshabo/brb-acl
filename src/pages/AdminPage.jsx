@@ -129,6 +129,7 @@ export default function AdminPage({ volunteers }) {
             Add without email
           </button>
         </form>
+        {status && <p className={status.ok ? 'ok' : 'err'}>{status.text}</p>}
         <p className="formnote">
           <b>Add &amp; invite</b> sends a sign-in link now. <b>Add without email</b> just puts them
           on the roster so you can plan around them — you can invite them later from their row.
