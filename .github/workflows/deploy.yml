@@ -108,6 +108,18 @@ jobs:
 
           ssh -p "$SSH_PORT" -i ~/.ssh/id_rsa $SSH_OPTS $EC2_USER@$EC2_HOST << 'EOF'
           set -euo pipefail
+
+          # This box runs several BRB apps. Refuse to deploy if any OTHER
+          # container already publishes 3006 — taking a port from a sibling
+          # would break it silently and leave this one half-deployed.
+          conflict="$(docker ps --format '{{.Names}} {{.Ports}}' \
+                      | grep ':3006->' | grep -v '^brb-acl ' || true)"
+          if [ -n "$conflict" ]; then
+            echo "ERROR: port 3006 is already published by: $conflict"
+            echo "Pick a free port in deploy.yml and the nginx vhost, then retry."
+            exit 1
+          fi
+
           docker load < /tmp/brb-acl.tar
           docker stop brb-acl || true
           docker rm   brb-acl || true
