@@ -4,11 +4,13 @@ import { explainAuthError } from '../firebase/authErrors'
 import '../styles/auth.css'
 
 /**
- * One way in for everyone. Admins aren't a separate sign-in path — admin
- * rights hang off the UID (aclAdmins/{uid}), so how you authenticate makes
- * no difference to what you can do.
+ * Two signposted entrances, one mechanism. Both send an email link — admin
+ * rights hang off the UID (aclAdmins/{uid}), so authentication is identical
+ * either way. The split exists so an admin isn't left wondering whether the
+ * volunteer form is the right door.
  */
 export default function Login() {
+  const [mode, setMode] = useState('volunteer')   // 'volunteer' | 'admin'
   // The hand-sent invite links to /?email=… so a volunteer arrives with their
   // address already in the box and only has to press the button.
   const [email, setEmail] = useState(() => {
@@ -21,6 +23,8 @@ export default function Login() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
+
+  const isAdmin = mode === 'admin'
 
   async function submit(e) {
     e.preventDefault()
@@ -62,19 +66,30 @@ export default function Login() {
     <div className="auth">
       <form className="card" onSubmit={submit}>
         <span className="eyebrow">BRB Coffee · ACL</span>
-        <h1>Volunteer sign-in</h1>
-        <p>Enter your email and we’ll send you a link that signs you straight in.</p>
+        <h1>{isAdmin ? 'Admin sign-in' : 'Volunteer sign-in'}</h1>
+        <p>
+          {isAdmin
+            ? 'Enter your admin email and we’ll send you a sign-in link. No password — access is tied to your account.'
+            : 'Enter your email and we’ll send you a link that signs you straight in.'}
+        </p>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder={isAdmin ? 'admin@brbcoffee-atx.com' : 'you@example.com'}
           autoComplete="email"
           required
         />
         {error && <p className="error">{error}</p>}
         <button type="submit" disabled={busy || !email}>
           {busy ? 'Sending…' : 'Send me a link'}
+        </button>
+        <button
+          type="button"
+          className="switch"
+          onClick={() => { setMode(isAdmin ? 'volunteer' : 'admin'); setError(null) }}
+        >
+          {isAdmin ? 'Back to volunteer sign-in' : 'Admin sign-in'}
         </button>
       </form>
     </div>

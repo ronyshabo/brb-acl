@@ -13,6 +13,8 @@ export function explainAuthError(err) {
       return 'This domain isn’t in Firebase’s authorized domains. Add it under Auth → Settings → Authorized domains.'
     case 'auth/invalid-email':
       return 'That doesn’t look like an email address.'
+    case 'auth/admin-restricted-operation':
+      return 'This project won’t create new accounts. Turn on Auth → Settings → User actions → "Enable create (sign-up)", or add this person in the Firebase console first.'
     case 'auth/invalid-action-code':
       return 'That link has already been used. Request a new one below.'
     case 'auth/expired-action-code':
