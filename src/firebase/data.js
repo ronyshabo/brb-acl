@@ -116,7 +116,7 @@ export async function dropPosition(slot, positionId, volunteerId, reason = '') {
  * a sign-in link has actually gone out. Keeping them distinct means the roster
  * can show who still needs an email, rather than claiming everyone was invited.
  */
-export async function addVolunteer({ name, email, phone = '', status = 'added', demo = false }) {
+export async function addVolunteer({ name, email, phone = '', status = 'added' }) {
   const id = volunteerIdFor(email)
   await setDoc(doc(db, 'aclVolunteers', id), {
     name: name.trim(),
@@ -126,7 +126,6 @@ export async function addVolunteer({ name, email, phone = '', status = 'added', 
     uid: null,
     invitedAt: status === 'invited' ? serverTimestamp() : null,
     claimedAt: null,
-    demo,
     notes: '',
   })
   return id

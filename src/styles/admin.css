@@ -11,15 +11,6 @@
 }
 .formnote b { color: var(--heading); }
 
-.examples {
-  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
-  margin-top: 12px; padding-top: 12px; border-top: 2px dashed var(--silver);
-}
-.examples button.danger { color: var(--error-text); }
-.examples span {
-  font-family: var(--font-ui); font-size: 12px; color: var(--ink-mute); flex: 1 1 200px;
-}
-
 .adminpage .ok {
   font-family: var(--font-ui); font-size: 12.5px; margin-top: 10px !important;
   color: var(--success-text); background: var(--success-bg);
@@ -52,7 +43,6 @@ table.roster td.mono { font-family: var(--font-mono); font-size: 12px; color: va
 .pill.active  { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
 .pill.invited { background: var(--gold);       color: var(--heading);      border-color: var(--heading); }
 .pill.added   { background: var(--silver-light); color: var(--ink-mute); }
-.pill.demo    { background: var(--info-bg); color: var(--info-text); border-color: var(--link); margin-left: 5px; }
 
 .rowacts { text-align: right; white-space: nowrap; }
 .rowacts button { padding: 5px 9px; font-size: 8px; margin-left: 5px; }

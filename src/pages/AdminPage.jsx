@@ -5,12 +5,10 @@ import {
   sendInvite,
   markInvited,
   clearAvailability,
-  setAvailability,
   setPositions,
   watchConfig,
   watchAssignments,
 } from '../firebase/data'
-import { EXAMPLE_VOLUNTEERS, exampleAvailability } from '../constants/examples'
 import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { SLOTS, POSITIONS } from '../constants/schedule'
@@ -61,58 +59,30 @@ export default function AdminPage({ volunteers }) {
     }
   }
 
-  async function addExamples() {
+  /**
+   * Removing someone has to unassign them first. Deleting the roster row on its
+   * own leaves aclAssignments holding a volunteer id that resolves to nobody,
+   * and the grid and station map then render blanks you can't clear.
+   */
+  async function remove(v) {
+    if (!window.confirm(`Remove ${v.name || v.id}? Any shifts they're on will be freed.`)) return
     setBusy(true)
     try {
-      for (const person of EXAMPLE_VOLUNTEERS) {
-        const id = await addVolunteer({ ...person, status: 'added', demo: true })
-        const slots = exampleAvailability(person)
-        for (const [slot, value] of Object.entries(slots)) {
-          await setAvailability(id, slot, value)
-        }
-      }
-      setStatus({ ok: true, text: `Added ${EXAMPLE_VOLUNTEERS.length} examples with availability filled in.` })
-    } catch (err) {
-      setStatus({ ok: false, text: `Couldn’t add examples${err?.code ? ` (${err.code})` : ''}.` })
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  async function removeExamples() {
-    const demos = volunteers.filter((v) => v.demo)
-    if (!demos.length) return
-    if (!window.confirm(`Remove ${demos.length} example volunteers and everything they're assigned to?`)) return
-
-    setBusy(true)
-    try {
-      const demoIds = new Set(demos.map((v) => v.id))
-
-      // Unassign them first — deleting the roster row without this leaves the
-      // grid pointing at volunteer ids that no longer exist.
       for (const slot of SLOTS) {
         const row = assignments[slot.id] || {}
-        if (!POSITIONS.some((p) => demoIds.has(row[p.id]))) continue
+        if (!POSITIONS.some((p) => row[p.id] === v.id)) continue
         const cleaned = { ...row }
-        for (const p of POSITIONS) if (demoIds.has(cleaned[p.id])) cleaned[p.id] = null
+        for (const p of POSITIONS) if (cleaned[p.id] === v.id) cleaned[p.id] = null
         await setPositions(slot.id, cleaned, { date: slot.date, shift: slot.shift })
       }
-
-      for (const v of demos) {
-        await clearAvailability(v.id)
-        await removeVolunteer(v.id)
-      }
-      setStatus({ ok: true, text: `Removed ${demos.length} examples.` })
+      await clearAvailability(v.id)
+      await removeVolunteer(v.id)
+      setStatus({ ok: true, text: `Removed ${v.name || v.id} and freed their shifts.` })
     } catch (err) {
-      setStatus({ ok: false, text: `Couldn’t remove examples${err?.code ? ` (${err.code})` : ''}.` })
+      setStatus({ ok: false, text: `Couldn't remove them${err?.code ? ` (${err.code})` : ''}.` })
     } finally {
       setBusy(false)
     }
-  }
-
-  function remove(v) {
-    if (!window.confirm(`Remove ${v.name || v.id} from the roster?`)) return
-    removeVolunteer(v.id)
   }
 
   const toggleLock = () =>
@@ -164,18 +134,6 @@ export default function AdminPage({ volunteers }) {
           on the roster so you can plan around them — you can invite them later from their row.
         </p>
 
-        <div className="examples">
-          <button type="button" onClick={addExamples} disabled={busy}>
-            Add {EXAMPLE_VOLUNTEERS.length} example volunteers
-          </button>
-          {volunteers.some((v) => v.demo) && (
-            <button type="button" className="danger" onClick={removeExamples} disabled={busy}>
-              Remove examples
-            </button>
-          )}
-          <span>Fake @example.com people with availability filled in, so the grid has something in it.</span>
-        </div>
-        {status && <p className={status.ok ? 'ok' : 'err'}>{status.text}</p>}
       </div>
 
       <div className="panel">
@@ -203,7 +161,6 @@ export default function AdminPage({ volunteers }) {
                       : v.status === 'invited' ? 'invited'
                       : 'not invited'}
                   </span>
-                  {v.demo && <span className="pill demo">example</span>}
                 </td>
                 <td className="rowacts">
                   {v.status !== 'active' && (
