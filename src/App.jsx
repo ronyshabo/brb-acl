@@ -8,6 +8,7 @@ import Login from './pages/Login'
 import FinishSignIn from './pages/FinishSignIn'
 import GridPage from './pages/GridPage'
 import StationPage from './pages/StationPage'
+import MenuPage from './pages/MenuPage'
 import AdminPage from './pages/AdminPage'
 
 export default function App() {
@@ -114,6 +115,7 @@ export default function App() {
         <div className="tabs">
           <NavLink to="/" end>Schedule</NavLink>
           <NavLink to="/station">Station</NavLink>
+          <NavLink to="/menu">Menu</NavLink>
           {isAdmin && <NavLink to="/admin">Roster</NavLink>}
         </div>
         <div className="who">
@@ -126,6 +128,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<GridPage me={me} isAdmin={isAdmin} volunteers={volunteers} />} />
           <Route path="/station" element={<StationPage me={me} isAdmin={isAdmin} volunteers={volunteers} />} />
+          <Route path="/menu" element={<MenuPage isAdmin={isAdmin} />} />
           <Route
             path="/admin"
             element={isAdmin ? <AdminPage volunteers={volunteers} /> : <Navigate to="/" replace />}

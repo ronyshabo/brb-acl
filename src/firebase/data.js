@@ -108,6 +108,28 @@ export async function dropPosition(slot, positionId, volunteerId, reason = '') {
   })
 }
 
+/* ── menu ───────────────────────────────────────────────────────────────── */
+
+export const watchMenu = (cb, onError) =>
+  onSnapshot(
+    collection(db, 'aclMenu'),
+    (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    onError
+  )
+
+export async function saveMenuItem(item) {
+  const { id, ...data } = item
+  const payload = { ...data, updatedAt: serverTimestamp() }
+  if (id) {
+    await setDoc(doc(db, 'aclMenu', id), payload, { merge: true })
+    return id
+  }
+  const ref = await addDoc(collection(db, 'aclMenu'), payload)
+  return ref.id
+}
+
+export const removeMenuItem = (id) => deleteDoc(doc(db, 'aclMenu', id))
+
 /* ── roster ─────────────────────────────────────────────────────────────── */
 
 /**

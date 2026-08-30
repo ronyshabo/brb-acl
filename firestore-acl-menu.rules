@@ -1,0 +1,15 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// brb-acl — aclMenu. ADDITIVE.
+//
+// Paste this INSIDE your existing
+//   match /databases/{database}/documents { ... }
+// block, next to the other acl blocks (between BEGIN brb-acl and END brb-acl
+// if you used those markers). Nothing else changes.
+//
+// Uses isAclAdmin(), which is already defined in that section.
+// ─────────────────────────────────────────────────────────────────────────────
+
+    match /aclMenu/{itemId} {
+      allow read: if isSignedIn();
+      allow write: if isAclAdmin();
+    }
