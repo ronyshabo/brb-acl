@@ -13,6 +13,7 @@ import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { SLOTS, POSITIONS } from '../constants/schedule'
 import { explainAuthError } from '../firebase/authErrors'
+import { INVITE_SUBJECT, buildInviteBody, gmailComposeUrl } from '../constants/inviteEmail'
 import '../styles/admin.css'
 
 export default function AdminPage({ volunteers }) {
@@ -86,6 +87,16 @@ export default function AdminPage({ volunteers }) {
   const toggleLock = () =>
     setDoc(doc(db, 'aclConfig', 'settings'), { locked: !config.locked }, { merge: true })
 
+  async function copyInvite(v) {
+    const text = `Subject: ${INVITE_SUBJECT}\n\n${buildInviteBody(v)}`
+    try {
+      await navigator.clipboard.writeText(text)
+      setStatus({ ok: true, text: `Invite for ${v.name || v.id} copied — paste it into Gmail.` })
+    } catch {
+      setStatus({ ok: false, text: 'Clipboard blocked by the browser. Use the Gmail button instead.' })
+    }
+  }
+
   function exportCsv() {
     const rows = [['date', 'shift', 'position', 'volunteer', 'email']]
     for (const slot of SLOTS) {
@@ -136,6 +147,27 @@ export default function AdminPage({ volunteers }) {
       </div>
 
       <div className="panel">
+        <h3>Invitation email</h3>
+        <p className="formnote">
+          Sent by hand from the BRB Gmail — it lands in inboxes and reads like a person,
+          which Firebase&rsquo;s automated mail does not. <b>Copy</b> puts it on your clipboard,
+          <b>Gmail</b> opens a compose window with it filled in. Each one is personalised with
+          the volunteer&rsquo;s first name from the roster.
+        </p>
+        <details className="preview">
+          <summary>Preview</summary>
+          <p className="subjline"><b>Subject:</b> {INVITE_SUBJECT}</p>
+          <pre>{buildInviteBody({ name: 'Maya Ortiz', email: 'maya@example.com' })}</pre>
+        </details>
+        <p className="formnote">
+          It carries no sign-in link on purpose — only the server can mint one without
+          sending it. Instead it points them at the portal with their address prefilled,
+          so Firebase&rsquo;s link arrives as something they just asked for.
+          <b> Invite</b> still fires that automated link directly if you&rsquo;d rather.
+        </p>
+      </div>
+
+      <div className="panel">
         <div className="panelhead">
           <h3>Roster · {volunteers.length}</h3>
           <div className="acts">
@@ -162,8 +194,20 @@ export default function AdminPage({ volunteers }) {
                   </span>
                 </td>
                 <td className="rowacts">
+                  <button onClick={() => copyInvite(v)} title="Copy the invitation text">
+                    Copy
+                  </button>
+                  <a
+                    className="btn"
+                    href={gmailComposeUrl(v)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Open Gmail with this invite ready to send"
+                  >
+                    Gmail
+                  </a>
                   {v.status !== 'active' && (
-                    <button onClick={() => invite(v)}>
+                    <button onClick={() => invite(v)} title="Send the automated Firebase sign-in link">
                       {v.status === 'invited' ? 'Resend' : 'Invite'}
                     </button>
                   )}

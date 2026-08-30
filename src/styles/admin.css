@@ -47,3 +47,27 @@ table.roster td.mono { font-family: var(--font-mono); font-size: 12px; color: va
 .rowacts { text-align: right; white-space: nowrap; }
 .rowacts button { padding: 5px 9px; font-size: 8px; margin-left: 5px; }
 .rowacts button.danger { color: var(--error-text); }
+
+/* Gmail link styled as a push button, matching the row actions */
+.rowacts a.btn {
+  display: inline-block; text-decoration: none;
+  font-family: var(--font-pixel); font-size: 8px; color: var(--ink);
+  background: var(--silver-light);
+  border: 2px solid var(--bevel-dark); border-top-color: #fff; border-left-color: #fff;
+  padding: 5px 9px; margin-left: 5px;
+}
+.rowacts a.btn:active {
+  border-color: #fff; border-top-color: var(--bevel-dark); border-left-color: var(--bevel-dark);
+}
+
+.preview { margin: 0 12px 10px; }
+.preview summary {
+  font-family: var(--font-pixel); font-size: 8px; color: var(--heading); cursor: pointer;
+}
+.preview .subjline { font-family: var(--font-ui); font-size: 12.5px; margin: 10px 0 6px !important; }
+.preview pre {
+  font-family: var(--font-ui); font-size: 12.5px; line-height: 1.55;
+  white-space: pre-wrap; word-wrap: break-word; margin: 0;
+  background: var(--warm-glow); border: 2px solid #000; padding: 12px;
+  max-height: 320px; overflow-y: auto;
+}

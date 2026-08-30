@@ -5,7 +5,15 @@ import '../styles/auth.css'
 
 export default function Login() {
   const [mode, setMode] = useState('link')      // 'link' | 'password'
-  const [email, setEmail] = useState('')
+  // The hand-sent invite links to /?email=… so a volunteer arrives with their
+  // address already in the box and only has to press the button.
+  const [email, setEmail] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get('email') || ''
+    } catch {
+      return ''
+    }
+  })
   const [password, setPassword] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState(null)
