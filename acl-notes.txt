@@ -1,0 +1,21 @@
+SSH into the AWS EC2 instance:
+  ssh -i brb-key.pem ubuntu@18.191.96.186
+
+Port: 3006 (reverse-proxied as acl.brbcoffee-atx.com)
+Dev port: 5177
+
+Ports already taken on the box: 3001 brb-baristas, 3005 brb-schedule.
+Confirm with `docker ps` before the first deploy.
+
+Build and run locally:
+  npm install
+  cp .env.local.example .env.local   # fill in from the shared BRB Firebase project
+  npm run dev                        # http://localhost:5177
+
+Before the first deploy, in the Firebase console:
+  1. Auth > Sign-in method > enable "Email link (passwordless sign-in)"
+  2. Auth > Settings > Authorized domains > add acl.brbcoffee-atx.com
+  3. Firestore > create aclAdmins/{your-uid} so you get the admin tabs
+  4. MERGE firestore.rules into the project rules before deploying them
+
+See README.md for the full deploy path.

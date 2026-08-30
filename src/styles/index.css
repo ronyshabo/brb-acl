@@ -1,0 +1,91 @@
+:root {
+  --bg: #F5F6F9;
+  --surface: #FFFFFF;
+  --surface-2: #EDEFF4;
+  --ink: #151A23;
+  --ink-mid: #47505F;
+  --ink-mute: #6B7484;
+  --rule: #DCE0E8;
+  --day: #A96504;
+  --day-bg: #FAF0DE;
+  --night: #4B41B0;
+  --night-bg: #E7E4F8;
+  --danger: #AF2B36;
+  --danger-bg: #FAE5E6;
+  --ok: #1F6B4F;
+  --ok-bg: #DFEFE7;
+  --radius: 6px;
+  --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--night);
+  outline-offset: 2px;
+}
+
+.boot, .gate {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; padding: 24px; text-align: center; color: var(--ink-mute);
+}
+.gate h1 { font-size: 22px; color: var(--ink); margin: 0; }
+.gate p { max-width: 42ch; line-height: 1.6; }
+.gate button {
+  border: 1px solid var(--rule); background: var(--surface);
+  padding: 9px 16px; border-radius: var(--radius); color: var(--ink);
+}
+
+/* ── top bar ─────────────────────────────────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; gap: 20px;
+  padding: 12px 20px; background: var(--surface);
+  border-bottom: 1px solid var(--rule); flex-wrap: wrap;
+}
+.brand { display: flex; align-items: baseline; gap: 8px; }
+.brand .mark { font-weight: 800; letter-spacing: -.02em; }
+.brand .ctx { font-size: 12px; color: var(--ink-mute); letter-spacing: .06em; text-transform: uppercase; }
+
+.tabs { display: flex; gap: 4px; margin-left: auto; }
+.tabs a {
+  padding: 7px 14px; border-radius: var(--radius); text-decoration: none;
+  color: var(--ink-mid); font-size: 14px; font-weight: 600;
+}
+.tabs a:hover { background: var(--surface-2); }
+.tabs a.active { background: var(--ink); color: var(--surface); }
+
+.who { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--ink-mute); }
+.who em { font-style: normal; color: var(--night); font-weight: 600; }
+.who button {
+  border: 1px solid var(--rule); background: transparent; color: var(--ink-mid);
+  padding: 6px 12px; border-radius: var(--radius); font-size: 13px;
+}
+
+main { padding: 20px; }
+
+/* ── shared panel ────────────────────────────────────────────────────── */
+.panel {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 16px;
+}
+.panel h3 {
+  margin: 0 0 10px; font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute);
+}
+.panel h3.bad { color: var(--danger); }
+.panel p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-mid); }
+.panel p.warn { color: var(--day); font-weight: 600; }
+.panel p.good { color: var(--ok); font-weight: 600; }

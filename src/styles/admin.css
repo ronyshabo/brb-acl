@@ -1,0 +1,44 @@
+.adminpage { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+.addform { display: flex; gap: 8px; flex-wrap: wrap; }
+.addform input {
+  flex: 1 1 180px; font-family: inherit; font-size: 14px; padding: 9px 11px;
+  border: 1px solid var(--rule); border-radius: var(--radius); background: var(--bg);
+}
+.addform button {
+  border: none; background: var(--ink); color: var(--surface);
+  padding: 9px 16px; border-radius: var(--radius); font-weight: 600;
+}
+.addform button:disabled { opacity: .5; cursor: not-allowed; }
+.adminpage .ok { color: var(--ok); font-weight: 600; margin-top: 10px; font-size: 13.5px; }
+.adminpage .err { color: var(--danger); font-weight: 600; margin-top: 10px; font-size: 13.5px; }
+
+.panelhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.panelhead h3 { margin: 0; }
+.acts { display: flex; gap: 8px; }
+.acts button {
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink-mid);
+  padding: 6px 12px; border-radius: var(--radius); font-size: 13px; font-weight: 600;
+}
+.acts button.locked { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+
+table.roster { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.roster th {
+  text-align: left; font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-mute);
+  padding: 8px 10px; border-bottom: 1px solid var(--rule);
+}
+table.roster td { padding: 9px 10px; border-bottom: 1px solid var(--surface-2); }
+table.roster td.mono { font-family: var(--mono); font-size: 12px; color: var(--ink-mute); }
+.pill {
+  font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+  background: var(--surface-2); color: var(--ink-mute);
+}
+.pill.active { background: var(--ok-bg); color: var(--ok); }
+.pill.invited { background: var(--day-bg); color: var(--day); }
+.rowacts { text-align: right; white-space: nowrap; }
+.rowacts button {
+  border: 1px solid var(--rule); background: transparent; color: var(--ink-mid);
+  padding: 4px 10px; border-radius: var(--radius); font-size: 12.5px; margin-left: 6px;
+}
+.rowacts button.danger { color: var(--danger); border-color: var(--danger-bg); }
