@@ -33,7 +33,7 @@ It's going to be a blast: great music, good energy, and a crew we're excited to 
 
 Here's how to get started:
 
-1. Open the volunteer portal: ${link}
+1. Open the volunteer portal: ${PORTAL}
 2. Hit "Send me a link" — we'll email you a one-click sign-in, no password to set up
 3. On the Schedule page, make sure the "Availability" view is selected — it opens there by default
 4. Find your name along the top of the grid, then click every shift you can work across both weekends
