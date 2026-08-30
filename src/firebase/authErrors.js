@@ -13,10 +13,10 @@ export function explainAuthError(err) {
       return 'This domain isn’t in Firebase’s authorized domains. Add it under Auth → Settings → Authorized domains.'
     case 'auth/invalid-email':
       return 'That doesn’t look like an email address.'
-    case 'auth/invalid-credential':
-    case 'auth/wrong-password':
-    case 'auth/user-not-found':
-      return 'That email and password don’t match an account.'
+    case 'auth/invalid-action-code':
+      return 'That link has already been used. Request a new one below.'
+    case 'auth/expired-action-code':
+      return 'That link has expired. Request a new one below.'
     case 'auth/too-many-requests':
       return 'Too many attempts. Wait a minute and try again.'
     case 'auth/network-request-failed':

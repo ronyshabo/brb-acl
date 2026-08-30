@@ -22,9 +22,17 @@ other BRB apps. Full reasoning is in [PLAN.md](PLAN.md).
 
 ## Sign-in
 
-Passwordless. Firebase Auth's email-link provider sends the mail itself — no SMTP,
-no SendGrid, no Cloud Function. A volunteer enters their email, gets a link, and is
-signed in. Access is gated on being in the `aclVolunteers` roster.
+Passwordless, for everyone including admins. Firebase Auth's email-link provider
+sends the mail itself — no SMTP, no SendGrid, no Cloud Function. Enter an email,
+get a link, you're in.
+
+Admin rights hang off the **UID**, not the sign-in method: `isAclAdmin()` checks
+for an `aclAdmins/{uid}` document (or the project's standing `isAdmin()`), so how
+you authenticated is irrelevant to what you can do.
+
+There is deliberately no password path. If the email-link provider is ever
+disabled, nobody can sign in — recovery is re-enabling it in the Firebase console,
+under Auth → Sign-in method → Email/Password → "Email link (passwordless sign-in)".
 
 ## Firestore
 

@@ -13,7 +13,6 @@ import {
   sendSignInLinkToEmail,
   isSignInWithEmailLink,
   signInWithEmailLink,
-  signInWithEmailAndPassword,
 } from 'firebase/auth'
 import { db, auth } from './config'
 import { emptyPositions, volunteerIdFor, POSITIONS } from '../constants/schedule'
@@ -208,15 +207,6 @@ export async function completeSignIn(emailFromPrompt) {
   }
   return { user: cred.user }
 }
-
-/**
- * Password sign-in, for admins. Volunteers use the magic link; this exists so
- * the admin isn't locked out when the email-link provider is unavailable, and
- * so there's a way in that doesn't depend on receiving mail.
- * Accounts are created in the Firebase console — the app never self-registers.
- */
-export const signInWithPassword = (email, password) =>
-  signInWithEmailAndPassword(auth, volunteerIdFor(email), password)
 
 /**
  * First-time link of a Firebase uid to the roster row. The rule only permits

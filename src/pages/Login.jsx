@@ -1,10 +1,14 @@
 import { useState } from 'react'
-import { sendInvite, signInWithPassword } from '../firebase/data'
+import { sendInvite } from '../firebase/data'
 import { explainAuthError } from '../firebase/authErrors'
 import '../styles/auth.css'
 
+/**
+ * One way in for everyone. Admins aren't a separate sign-in path — admin
+ * rights hang off the UID (aclAdmins/{uid}), so how you authenticate makes
+ * no difference to what you can do.
+ */
 export default function Login() {
-  const [mode, setMode] = useState('link')      // 'link' | 'password'
   // The hand-sent invite links to /?email=… so a volunteer arrives with their
   // address already in the box and only has to press the button.
   const [email, setEmail] = useState(() => {
@@ -14,7 +18,6 @@ export default function Login() {
       return ''
     }
   })
-  const [password, setPassword] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -24,12 +27,8 @@ export default function Login() {
     setBusy(true)
     setError(null)
     try {
-      if (mode === 'link') {
-        await sendInvite(email)
-        setSent(true)
-      } else {
-        await signInWithPassword(email, password)   // App picks up the auth state change
-      }
+      await sendInvite(email)
+      setSent(true)
     } catch (err) {
       setError(explainAuthError(err))
     } finally {
@@ -41,12 +40,19 @@ export default function Login() {
     return (
       <div className="auth">
         <div className="card">
+          <span className="eyebrow">BRB Coffee · ACL</span>
           <h1>Check your email</h1>
           <p>
             We sent a sign-in link to <b>{email}</b>. Open it on this device if you can —
             it signs you straight in, no password.
           </p>
-          <button className="ghost" onClick={() => setSent(false)}>Use a different address</button>
+          <p className="quiet">
+            Not there after a minute? Check spam — it comes from
+            noreply@brb-coffee-dev.firebaseapp.com.
+          </p>
+          <button className="ghost" onClick={() => setSent(false)}>
+            Use a different address
+          </button>
         </div>
       </div>
     )
@@ -56,13 +62,8 @@ export default function Login() {
     <div className="auth">
       <form className="card" onSubmit={submit}>
         <span className="eyebrow">BRB Coffee · ACL</span>
-        <h1>{mode === 'link' ? 'Volunteer sign-in' : 'Admin sign-in'}</h1>
-        <p>
-          {mode === 'link'
-            ? 'Enter the email you were invited with and we’ll send you a sign-in link.'
-            : 'Sign in with the password on your Firebase account.'}
-        </p>
-
+        <h1>Volunteer sign-in</h1>
+        <p>Enter your email and we’ll send you a link that signs you straight in.</p>
         <input
           type="email"
           value={email}
@@ -71,30 +72,9 @@ export default function Login() {
           autoComplete="email"
           required
         />
-
-        {mode === 'password' && (
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            autoComplete="current-password"
-            required
-          />
-        )}
-
         {error && <p className="error">{error}</p>}
-
-        <button type="submit" disabled={busy || !email || (mode === 'password' && !password)}>
-          {busy ? 'Working…' : mode === 'link' ? 'Send me a link' : 'Sign in'}
-        </button>
-
-        <button
-          type="button"
-          className="switch"
-          onClick={() => { setMode(mode === 'link' ? 'password' : 'link'); setError(null) }}
-        >
-          {mode === 'link' ? 'Admin sign-in with a password' : 'Back to volunteer sign-in'}
+        <button type="submit" disabled={busy || !email}>
+          {busy ? 'Sending…' : 'Send me a link'}
         </button>
       </form>
     </div>

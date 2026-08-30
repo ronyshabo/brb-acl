@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { completeSignIn } from '../firebase/data'
+import { explainAuthError } from '../firebase/authErrors'
 import '../styles/auth.css'
 
 export default function FinishSignIn() {
@@ -10,7 +11,7 @@ export default function FinishSignIn() {
   useEffect(() => {
     completeSignIn()
       .then((r) => { if (r.needsEmail) setNeedsEmail(true) })
-      .catch(() => setError('That link didn’t work. It may have expired — request a new one.'))
+      .catch((err) => setError(explainAuthError(err)))
   }, [])
 
   async function submit(e) {
@@ -18,8 +19,8 @@ export default function FinishSignIn() {
     setError(null)
     try {
       await completeSignIn(email)
-    } catch {
-      setError('That address doesn’t match the link. Try the one the invite was sent to.')
+    } catch (err) {
+      setError(explainAuthError(err))
     }
   }
 
