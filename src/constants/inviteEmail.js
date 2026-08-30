@@ -37,6 +37,7 @@ Here's how to get started:
 2. Hit "Send me a link" — we'll email you a one-click sign-in, no password to set up
 3. On the Schedule page, make sure the "Availability" view is selected — it opens there by default
 4. Find your name along the top of the grid, then click every shift you can work across both weekends
+5. That's it — just close the window. Everything saves as you click, there's nothing to submit
 
 We'll build the schedule from everyone's availability, and you'll be able to see exactly where and when you're working. You can update it any time.
 

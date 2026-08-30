@@ -51,7 +51,9 @@ Here's how to get started:
    it opens there by default
 3. Find your name along the top of the grid, then click every shift you
    can work across both weekends
-4. We'll build the schedule from everyone's availability and you'll see
+4. That's it — just close the window. Everything saves as you click,
+   there's nothing to submit
+5. We'll build the schedule from everyone's availability and you'll see
    exactly where and when you're working
 
 You can update your availability any time right in the portal, and if
