@@ -47,8 +47,11 @@ Here's how to get started:
 
    %LINK%
 
-2. Mark the shifts you're free for across both weekends
-3. We'll build the schedule from everyone's availability and you'll see
+2. On the Schedule page, make sure the "Availability" view is selected —
+   it opens there by default
+3. Find your name along the top of the grid, then click every shift you
+   can work across both weekends
+4. We'll build the schedule from everyone's availability and you'll see
    exactly where and when you're working
 
 You can update your availability any time right in the portal, and if
