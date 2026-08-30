@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { watchAssignments } from '../firebase/data'
 import { SLOTS, POSITIONS } from '../constants/schedule'
-import { BRIEFINGS, FLOW_NOTES } from '../constants/positions'
+import { briefingFor, FLOW_NOTES } from '../constants/positions'
 import StationMap from '../components/StationMap'
 import '../styles/station.css'
 
@@ -35,7 +35,7 @@ export default function StationPage({ me, isAdmin, volunteers }) {
     ? POSITIONS.find((p) => positions[p.id] === me.id)?.id ?? null
     : null
 
-  const brief = picked ? BRIEFINGS[picked] : null
+  const brief = picked ? briefingFor(picked) : null
 
   return (
     <div className="stationpage">
@@ -85,6 +85,7 @@ export default function StationPage({ me, isAdmin, volunteers }) {
             <div className="panel brief">
               <button className="close" onClick={() => setPicked(null)} aria-label="Close">×</button>
               <h3>{brief.title}</h3>
+              <p className="role">{brief.role}</p>
               <p className="summary">{brief.summary}</p>
               <p className="holder">
                 {positions[picked]

@@ -1,54 +1,48 @@
 // Static briefing shown when someone taps a position on the station map.
-// Four short documents that change maybe twice before the fest — a constants
-// module costs nothing to read and nothing to deploy. If this ever needs
-// editing from a phone mid-fest, move it to aclStationInfo/{positionId}.
+//
+// Keyed by role, not by seat: front-left and front-right do the same job, as do
+// the two back positions. Left and right are only where you stand.
 
-export const BRIEFINGS = {
-  'front-left': {
-    title: 'Front left — orders',
-    summary: 'Customer-facing, left half of the table.',
+import { POSITIONS } from './schedule'
+
+export const ROLE_BRIEFINGS = {
+  front: {
+    role: 'Front — orders & handoff',
+    summary: 'Customer-facing, at the table. You own the order from hello to handoff.',
     duties: [
-      'Take orders and payment for the left queue',
-      'Call drinks back to the back-left position',
-      'Keep cups, lids, and straws stocked on your half of the table',
-      'Watch the barrier line — wave people into the shorter queue',
+      'Take the order and run the transaction on the POS',
+      'Get the customer’s name with every order',
+      'Call the drink back to the back crew',
+      'Handle food and snacks start to finish — those never go to the back',
+      'Hand the drink over by name, and check it matches before you release it',
     ],
   },
-  'front-right': {
-    title: 'Front right — orders',
-    summary: 'Customer-facing, right half of the table.',
+  back: {
+    role: 'Back — build & restock',
+    summary: 'Behind the table, at the ice machine and the back tables.',
     duties: [
-      'Take orders and payment for the right queue',
-      'Call drinks back to the back-right position',
-      'Keep cups, lids, and straws stocked on your half of the table',
-      'Own the tip jar and the menu board',
-    ],
-  },
-  'back-left': {
-    title: 'Back left — build & ice',
-    summary: 'Behind the table, left of the ice machine.',
-    duties: [
-      'Build drinks called from front left',
-      'Keep the left bucket pair filled from the back table',
-      'Share the ice machine — it is between you and back right',
-      'Flag low stock early; a runner refill takes ~15 minutes',
-    ],
-  },
-  'back-right': {
-    title: 'Back right — build & ice',
-    summary: 'Behind the table, right of the ice machine.',
-    duties: [
-      'Build drinks called from front right',
-      'Keep the right bucket pair filled from the back table',
-      'Share the ice machine — it is between you and back left',
-      'Break down and haul trash at end of the night shift',
+      'Build drinks as they’re called forward — properly iced, clean cup, presentable',
+      'Keep receipts and orders straight so nothing gets mixed up',
+      'Refill the drink buckets from the back tables',
+      'Top up ice before it runs low, not after',
+      'Keep the back of house reachable — don’t block the path between the tables',
     ],
   },
 }
 
+/** The briefing for a position, plus that seat's own label. */
+export function briefingFor(positionId) {
+  const position = POSITIONS.find((p) => p.id === positionId)
+  if (!position) return null
+  const brief = ROLE_BRIEFINGS[position.row]
+  return { ...brief, title: position.label, position }
+}
+
 export const FLOW_NOTES = [
-  'Customers enter head-on through the barriers and split into two queues.',
-  'Side barriers keep foot traffic from cutting across the front of the table.',
-  'Orders go front → back on the same side. Do not cross the ice machine.',
-  'Back tables are stock only — no customers past the table line.',
+  'Customers come in at the front of the table. Nobody goes past the table line.',
+  'Front takes the order and the customer’s name, then calls it back.',
+  'Back builds the drink and passes it forward.',
+  'Front checks the name out loud before handing it over — that’s what stops mix-ups.',
+  'Food and snacks stay at the front. They never go to the back.',
+  'Back watches ice and bucket levels continuously. A refill run takes time you won’t have in a rush.',
 ]
