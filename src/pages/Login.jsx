@@ -1,26 +1,7 @@
 import { useState } from 'react'
 import { sendInvite, signInWithPassword } from '../firebase/data'
+import { explainAuthError } from '../firebase/authErrors'
 import '../styles/auth.css'
-
-/** Firebase error codes, said in plain language. */
-function explain(err) {
-  switch (err?.code) {
-    case 'auth/operation-not-allowed':
-      return 'Email-link sign-in isn’t switched on for this Firebase project yet. Enable it under Auth → Sign-in method, or use admin sign-in below.'
-    case 'auth/invalid-email':
-      return 'That doesn’t look like an email address.'
-    case 'auth/unauthorized-continue-uri':
-      return 'This domain isn’t in Firebase’s authorized domains list.'
-    case 'auth/invalid-credential':
-    case 'auth/wrong-password':
-    case 'auth/user-not-found':
-      return 'That email and password don’t match an account.'
-    case 'auth/too-many-requests':
-      return 'Too many attempts. Wait a minute and try again.'
-    default:
-      return `Sign-in failed${err?.code ? ` (${err.code})` : ''}.`
-  }
-}
 
 export default function Login() {
   const [mode, setMode] = useState('link')      // 'link' | 'password'
@@ -42,7 +23,7 @@ export default function Login() {
         await signInWithPassword(email, password)   // App picks up the auth state change
       }
     } catch (err) {
-      setError(explain(err))
+      setError(explainAuthError(err))
     } finally {
       setBusy(false)
     }

@@ -12,9 +12,16 @@ Build and run locally:
   cp .env.local.example .env.local   # fill in from the shared BRB Firebase project
   npm run dev                        # http://localhost:5177
 
-Before the first deploy, in the Firebase console:
-  1. Auth > Sign-in method > enable "Email link (passwordless sign-in)"
+Firebase console setup (invites DO NOT send until 1 and 2 are done):
+  1. Auth > Sign-in method > Email/Password > tick the second checkbox,
+     "Email link (passwordless sign-in)". Email/Password itself is already
+     on — the link option is a separate toggle inside the same provider.
   2. Auth > Settings > Authorized domains > add acl.brbcoffee-atx.com
+     (localhost is authorized by default; the production domain is not,
+     and without it invites fail with auth/unauthorized-continue-uri)
+  3. Optional: Auth > Templates > "Email address sign-in" to change the
+     sender name, subject, and body. Customization is limited — a fully
+     branded invite would need a Cloud Function plus an email service.
   3. Firestore > create aclAdmins/{your-uid} so you get the admin tabs
   4. MERGE firestore.rules into the project rules before deploying them
 

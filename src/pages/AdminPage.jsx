@@ -12,6 +12,7 @@ import {
 import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { SLOTS, POSITIONS } from '../constants/schedule'
+import { explainAuthError } from '../firebase/authErrors'
 import '../styles/admin.css'
 
 export default function AdminPage({ volunteers }) {
@@ -40,10 +41,7 @@ export default function AdminPage({ volunteers }) {
       setName('')
       setEmail('')
     } catch (err) {
-      setStatus({
-        ok: false,
-        text: `Couldn’t add them${err?.code ? ` (${err.code})` : ''}. Check the email address.`,
-      })
+      setStatus({ ok: false, text: `Couldn’t add them. ${explainAuthError(err)}` })
     } finally {
       setBusy(false)
     }
@@ -55,7 +53,7 @@ export default function AdminPage({ volunteers }) {
       await markInvited(v.id)
       setStatus({ ok: true, text: `Sign-in link sent to ${v.id}.` })
     } catch (err) {
-      setStatus({ ok: false, text: `Couldn’t send to ${v.id}${err?.code ? ` (${err.code})` : ''}.` })
+      setStatus({ ok: false, text: `Couldn’t invite ${v.id}. ${explainAuthError(err)}` })
     }
   }
 
