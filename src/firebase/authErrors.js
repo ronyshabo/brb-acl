@@ -19,6 +19,8 @@ export function explainAuthError(err) {
       return 'That link has already been used. Request a new one below.'
     case 'auth/expired-action-code':
       return 'That link has expired. Request a new one below.'
+    case 'auth/quota-exceeded':
+      return 'Firebase’s email quota for this project is used up for now. It resets on its own — try again later, or ask an admin to send you the link.'
     case 'auth/too-many-requests':
       return 'Too many attempts. Wait a minute and try again.'
     case 'auth/network-request-failed':
