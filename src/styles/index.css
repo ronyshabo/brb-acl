@@ -1,91 +1,194 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   BRB house theme — retro Win95 / geocities, matched to brb-website/src/App.css.
+   Palette and chrome are lifted from there so the fest app reads as part of
+   the same site.
+
+   One deliberate departure: brb-website sets 'Press Start 2P' globally at 10px.
+   That's unreadable for a 12-row x N-column grid of names, so pixel type is
+   used for chrome (titles, buttons, labels) and MS Sans Serif / Courier for
+   dense data — both faces the site already uses.
+   ────────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --bg: #F5F6F9;
-  --surface: #FFFFFF;
-  --surface-2: #EDEFF4;
-  --ink: #151A23;
-  --ink-mid: #47505F;
-  --ink-mute: #6B7484;
-  --rule: #DCE0E8;
-  --day: #A96504;
-  --day-bg: #FAF0DE;
-  --night: #4B41B0;
-  --night-bg: #E7E4F8;
-  --danger: #AF2B36;
-  --danger-bg: #FAE5E6;
-  --ok: #1F6B4F;
-  --ok-bg: #DFEFE7;
-  --radius: 6px;
-  --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --accent:        #eb5a40;
+  --paper:         #f7e6d4;
+  --page-bg:       #167e56;
+  --heading:       #800000;
+  --cta:           #197a4d;
+  --link:          #000080;
+  --gold:          #ffd76b;
+  --warm-glow:     #fff7ec;
+
+  --window:        #ffffff;
+  --silver:        #c0c0c0;
+  --silver-light:  #dfdfdf;
+  --bevel-dark:    #404040;
+  --ink:           #111111;
+  --ink-mute:      #4a4a4a;
+
+  --success-bg:    #ccffcc;
+  --success-border:#00aa00;
+  --success-text:  #006600;
+  --error-bg:      #ffcccc;
+  --error-border:  #cc0000;
+  --error-text:    #cc0000;
+  --info-bg:       #c5e3f6;
+  --info-text:     #003399;
+
+  --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+  --font-ui:    'MS Sans Serif', Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono:  'Courier New', Courier, monospace;
+
+  /* classic raised / sunken chrome */
+  --raised: 1px 1px 0 #fff inset, -1px -1px 0 var(--bevel-dark) inset;
+  --sunken: -1px -1px 0 #fff inset, 1px 1px 0 var(--bevel-dark) inset;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
-  font-family: var(--sans);
-  font-size: 15px;
-  -webkit-font-smoothing: antialiased;
+  background-color: var(--page-bg);
+  background-image:
+    linear-gradient(0deg,  rgba(255,255,255,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: auto;
 }
 
-button { font-family: inherit; cursor: pointer; }
+h1, h2, h3, .pixel {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+button { font-family: var(--font-pixel); cursor: pointer; }
 button:focus-visible, a:focus-visible, input:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--night);
-  outline-offset: 2px;
+  outline: 2px dotted var(--ink);
+  outline-offset: 1px;
 }
 
+/* Win95 push button */
+button {
+  background: var(--silver-light);
+  color: var(--ink);
+  border: 2px solid var(--bevel-dark);
+  border-top-color: #fff;
+  border-left-color: #fff;
+  padding: 7px 12px;
+  font-size: 9px;
+  letter-spacing: .02em;
+}
+button:not(:disabled):active {
+  border-color: #fff;
+  border-top-color: var(--bevel-dark);
+  border-left-color: var(--bevel-dark);
+}
+button:disabled { color: var(--silver); cursor: not-allowed; }
+
+input {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  padding: 7px 9px;
+  background: #fff;
+  border: 2px solid #fff;
+  border-top-color: var(--bevel-dark);
+  border-left-color: var(--bevel-dark);
+}
+
+/* ── boot / gate screens ─────────────────────────────────────────────────── */
 .boot, .gate {
   min-height: 100vh;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 12px; padding: 24px; text-align: center; color: var(--ink-mute);
+  gap: 14px; padding: 24px; text-align: center;
+  font-family: var(--font-pixel); font-size: 10px; color: var(--paper);
 }
-.gate h1 { font-size: 22px; color: var(--ink); margin: 0; }
-.gate p { max-width: 42ch; line-height: 1.6; }
-.gate button {
-  border: 1px solid var(--rule); background: var(--surface);
-  padding: 9px 16px; border-radius: var(--radius); color: var(--ink);
+.gate h1 { font-size: 14px; color: var(--gold); margin: 0; }
+.gate p {
+  max-width: 46ch; line-height: 1.7; font-family: var(--font-ui);
+  font-size: 14px; color: var(--paper);
+}
+.gate .hint { color: var(--silver); font-size: 13px; }
+.gate code {
+  font-family: var(--font-mono); font-size: 13px;
+  background: rgba(0,0,0,.28); padding: 2px 6px;
 }
 
-/* ── top bar ─────────────────────────────────────────────────────────── */
+/* ── window chrome ───────────────────────────────────────────────────────── */
+.app { padding: 12px; }
+
 .topbar {
-  display: flex; align-items: center; gap: 20px;
-  padding: 12px 20px; background: var(--surface);
-  border-bottom: 1px solid var(--rule); flex-wrap: wrap;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  background: var(--accent); color: #fff;
+  border: 2px solid #000; border-bottom: none;
+  padding: 8px 12px;
 }
-.brand { display: flex; align-items: baseline; gap: 8px; }
-.brand .mark { font-weight: 800; letter-spacing: -.02em; }
-.brand .ctx { font-size: 12px; color: var(--ink-mute); letter-spacing: .06em; text-transform: uppercase; }
+.brand { display: flex; align-items: baseline; gap: 9px; }
+.brand .mark { font-family: var(--font-pixel); font-size: 12px; }
+.brand .ctx  { font-family: var(--font-pixel); font-size: 8px; opacity: .9; }
 
-.tabs { display: flex; gap: 4px; margin-left: auto; }
+.tabs { display: flex; gap: 5px; margin-left: auto; }
 .tabs a {
-  padding: 7px 14px; border-radius: var(--radius); text-decoration: none;
-  color: var(--ink-mid); font-size: 14px; font-weight: 600;
+  font-family: var(--font-pixel); font-size: 9px; text-decoration: none;
+  color: var(--ink); background: var(--silver-light);
+  border: 2px solid var(--bevel-dark); border-top-color: #fff; border-left-color: #fff;
+  padding: 7px 11px;
 }
-.tabs a:hover { background: var(--surface-2); }
-.tabs a.active { background: var(--ink); color: var(--surface); }
-
-.who { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--ink-mute); }
-.who em { font-style: normal; color: var(--night); font-weight: 600; }
-.who button {
-  border: 1px solid var(--rule); background: transparent; color: var(--ink-mid);
-  padding: 6px 12px; border-radius: var(--radius); font-size: 13px;
+.tabs a.active {
+  background: var(--paper);
+  border-color: #fff; border-top-color: var(--bevel-dark); border-left-color: var(--bevel-dark);
 }
 
-main { padding: 20px; }
+.who {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ui); font-size: 12px; color: #fff;
+}
+.who em { font-style: normal; color: var(--gold); }
 
-/* ── shared panel ────────────────────────────────────────────────────── */
+main {
+  background: var(--paper);
+  border: 2px solid #000;
+  padding: 16px;
+}
+
+/* ── panels ──────────────────────────────────────────────────────────────── */
 .panel {
-  background: var(--surface); border: 1px solid var(--rule);
-  border-radius: var(--radius); padding: 16px;
+  background: var(--window);
+  border: 2px solid #000;
+  padding: 0 0 12px;
 }
 .panel h3 {
-  margin: 0 0 10px; font-size: 11px; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute);
+  margin: 0 0 10px; padding: 6px 10px;
+  font-family: var(--font-pixel); font-size: 9px;
+  background: var(--accent); color: #fff;
+  border-bottom: 2px solid #000;
 }
-.panel h3.bad { color: var(--danger); }
-.panel p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-mid); }
-.panel p.warn { color: var(--day); font-weight: 600; }
-.panel p.good { color: var(--ok); font-weight: 600; }
+.panel h3.bad { background: var(--error-border); }
+.panel > p, .panel > ul, .panel > form, .panel > table,
+.panel > .addform, .panel > .formnote, .panel > .examples,
+.panel > .panelhead, .panel > .week, .panel > .calnote {
+  margin-left: 12px; margin-right: 12px;
+}
+.panel p { font-family: var(--font-ui); font-size: 13px; line-height: 1.6; margin: 0; }
+.panel p.warn { color: var(--error-text); font-weight: bold; }
+.panel p.good { color: var(--success-text); font-weight: bold; }
+
+/* first-admin bootstrap on the gate screen */
+.gate .bootstrap {
+  background: var(--window); border: 2px solid #000;
+  padding: 12px 14px; max-width: 46ch; text-align: left;
+}
+.gate .bootstrap summary {
+  font-family: var(--font-pixel); font-size: 9px; cursor: pointer; color: var(--heading);
+}
+.gate .bootstrap p { color: var(--ink); font-size: 13px; margin: 10px 0; }
+.gate .bootstrap .uid {
+  display: block; background: var(--info-bg); color: var(--info-text);
+  padding: 8px 10px; word-break: break-all; margin-bottom: 8px;
+  box-shadow: var(--sunken);
+}

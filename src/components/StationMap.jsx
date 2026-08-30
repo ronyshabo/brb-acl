@@ -18,22 +18,13 @@ export default function StationMap({ positions = {}, nameFor, highlight, onPick 
   return (
     <svg
       className="stationmap"
-      viewBox="0 70 640 590"
+      viewBox="0 235 640 390"
       role="img"
-      aria-label="BRB station floor plan with volunteer positions"
+      aria-label="BRB station floor plan: service table, four volunteer positions around an ice machine, and two back tables with drink buckets"
     >
-      <text x="320" y="92" className="flow" textAnchor="middle">CUSTOMERS APPROACH</text>
-      <path d="M320 102 L320 126" className="fl" />
-      <path d="M314 120 L320 128 L326 120" className="fl" />
-
-      <polygon className="bar" points="205,140 222,157 205,240 188,257 188,157" />
-      <polygon className="bar" points="395,140 412,157 395,240 378,257 378,157" />
-      <polygon className="bar" points="205,255 222,272 205,300 188,317 188,272" />
-      <polygon className="bar" points="395,255 412,272 395,300 378,317 378,272" />
-      <polygon className="bar" points="150,310 90,310 30,340 90,370 150,370 90,340" />
-      <polygon className="bar" points="490,310 550,310 610,340 550,370 490,370 550,340" />
-      <text x="168" y="205" className="lbl" textAnchor="end">traffic</text>
-      <text x="168" y="219" className="lbl" textAnchor="end">barriers</text>
+      <text x="320" y="258" className="flow" textAnchor="middle">CUSTOMERS APPROACH</text>
+      <path d="M320 268 L320 288" className="fl" />
+      <path d="M314 282 L320 290 L326 282" className="fl" />
 
       <rect x="140" y="300" width="320" height="60" className="tbl" />
       <text x="300" y="337" className="tlbl" textAnchor="middle">SERVICE TABLE</text>
