@@ -9,7 +9,6 @@ import {
 } from '../firebase/data'
 import { SLOTS, POSITIONS, HEADCOUNT } from '../constants/schedule'
 import ShiftGrid from '../components/ShiftGrid'
-import FestCalendar from '../components/FestCalendar'
 import '../styles/grid.css'
 
 export default function GridPage({ me, isAdmin, volunteers }) {
@@ -17,7 +16,6 @@ export default function GridPage({ me, isAdmin, volunteers }) {
   const [availability, setAvail] = useState({})
   const [assignments, setAssign] = useState({})
   const [config, setConfig] = useState({ locked: false })
-  const [focusDate, setFocusDate] = useState(null)
 
   useEffect(() => watchAvailability(setAvail), [])
   useEffect(() => watchAssignments(setAssign), [])
@@ -73,13 +71,6 @@ export default function GridPage({ me, isAdmin, volunteers }) {
   return (
     <div className="gridpage">
       <aside>
-        <FestCalendar
-          assignments={assignments}
-          me={me}
-          focusDate={focusDate}
-          onPick={setFocusDate}
-        />
-
         <div className="panel">
           <h3>Coverage</h3>
           <p className={unfilled ? 'warn' : 'good'}>

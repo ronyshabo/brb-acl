@@ -111,29 +111,6 @@ td.cover .ok    { color: var(--success-text); }
 .conflicts li { margin-bottom: 6px; }
 .panel.hint p { font-size: 12.5px; }
 
-/* ── side calendar ───────────────────────────────────────────────────────── */
-.calendar .week { margin-bottom: 12px; }
-.calendar .wklabel { font-family: var(--font-pixel); font-size: 8px; color: var(--heading); }
-.calendar .days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 7px; }
-.calendar .day {
-  background: var(--silver-light); padding: 7px 3px;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-}
-.calendar .day.focus  { background: var(--gold); }
-.calendar .day.working { background: var(--info-bg); }
-.calendar .dow { font-family: var(--font-pixel); font-size: 7px; color: var(--ink-mute); }
-.calendar .num { font-family: var(--font-mono); font-size: 17px; font-weight: bold; }
-.calendar .dots { display: flex; gap: 4px; }
-.calendar .dot { width: 7px; height: 7px; border: 1px solid var(--bevel-dark); background: #fff; }
-.calendar .dot.on.day    { background: var(--gold);  border-color: var(--heading); }
-.calendar .dot.on.night  { background: var(--link);  border-color: var(--link); }
-.calendar .dot.partial.day   { background: linear-gradient(90deg, var(--gold) 50%, #fff 50%); border-color: var(--heading); }
-.calendar .dot.partial.night { background: linear-gradient(90deg, var(--link) 50%, #fff 50%); border-color: var(--link); }
-.calendar .calnote {
-  font-family: var(--font-ui); font-size: 11.5px; line-height: 1.5;
-  color: var(--ink-mute); margin-top: 8px;
-}
-
 
 /* ── phone ───────────────────────────────────────────────────────────────
    Narrower columns and a shorter scroll box so the grid stays usable on a
@@ -161,7 +138,4 @@ td.cover .ok    { color: var(--success-text); }
 
   .legend { gap: 8px 12px; font-size: 11.5px; padding: 8px; }
   .legend .codes { flex-basis: 100%; }
-
-  .calendar .days { gap: 4px; }
-  .calendar .num { font-size: 15px; }
 }
