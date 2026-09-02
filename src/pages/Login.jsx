@@ -86,7 +86,7 @@ export default function Login() {
         <p className="quiet">
           First time here? Use the <b>Create your account</b> link in your invitation
           email, or <Link to={`/join${email ? `?email=${encodeURIComponent(email)}` : ''}`}>
-          set a password now</Link>.
+          sign up</Link>.
         </p>
       </form>
     </div>
