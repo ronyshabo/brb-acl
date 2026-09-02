@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import {
   addVolunteer,
   removeVolunteer,
-  sendInvite,
   markInvited,
   clearAvailability,
   setPositions,
@@ -27,18 +26,12 @@ export default function AdminPage({ volunteers }) {
   useEffect(() => watchConfig(setConfig), [])
   useEffect(() => watchAssignments(setAssign), [])
 
-  async function add(e, { invite }) {
+  async function add(e) {
     e.preventDefault()
     setBusy(true)
     try {
-      const id = await addVolunteer({ name, email, status: invite ? 'invited' : 'added' })
-      if (invite) await sendInvite(id)
-      setStatus({
-        ok: true,
-        text: invite
-          ? `Added ${name} and sent a sign-in link to ${id}.`
-          : `Added ${name}. No email sent — use Invite on their row when you're ready.`,
-      })
+      await addVolunteer({ name, email, status: 'added' })
+      setStatus({ ok: true, text: `Added ${name}. Send their invite with Gmail on their row.` })
       setName('')
       setEmail('')
     } catch (err) {
@@ -48,14 +41,9 @@ export default function AdminPage({ volunteers }) {
     }
   }
 
-  async function invite(v) {
-    try {
-      await sendInvite(v.id)
-      await markInvited(v.id)
-      setStatus({ ok: true, text: `Sign-in link sent to ${v.id}.` })
-    } catch (err) {
-      setStatus({ ok: false, text: `Couldn’t invite ${v.id}. ${explainAuthError(err)}` })
-    }
+  /** Opening the invite is the moment it's sent, near enough. */
+  function markSent(v) {
+    if (v.status === 'added') markInvited(v.id).catch(() => {})
   }
 
   /**
@@ -91,6 +79,7 @@ export default function AdminPage({ volunteers }) {
     const text = `Subject: ${INVITE_SUBJECT}\n\n${buildInviteBody(v)}`
     try {
       await navigator.clipboard.writeText(text)
+      markSent(v)
       setStatus({ ok: true, text: `Invite for ${v.name || v.id} copied — paste it into Gmail.` })
     } catch {
       setStatus({ ok: false, text: 'Clipboard blocked by the browser. Use the Gmail button instead.' })
@@ -119,7 +108,7 @@ export default function AdminPage({ volunteers }) {
     <div className="adminpage">
       <div className="panel">
         <h3>Add a volunteer</h3>
-        <form onSubmit={(e) => add(e, { invite: true })} className="addform">
+        <form onSubmit={add} className="addform">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required />
           <input
             type="email"
@@ -188,7 +177,7 @@ export default function AdminPage({ volunteers }) {
                 <td className="mono" data-label="Email">{v.id}</td>
                 <td data-label="Status">
                   <span className={`pill ${v.status}`}>
-                    {v.status === 'active' ? 'signed in'
+                    {v.status === 'active' ? 'has account'
                       : v.status === 'invited' ? 'invited'
                       : 'not invited'}
                   </span>
@@ -202,15 +191,11 @@ export default function AdminPage({ volunteers }) {
                     href={gmailComposeUrl(v)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => markSent(v)}
                     title="Open Gmail with this invite ready to send"
                   >
                     Gmail
                   </a>
-                  {v.status !== 'active' && (
-                    <button onClick={() => invite(v)} title="Send the automated Firebase sign-in link">
-                      {v.status === 'invited' ? 'Resend' : 'Invite'}
-                    </button>
-                  )}
                   <button className="danger" onClick={() => remove(v)}>Remove</button>
                 </td>
               </tr>

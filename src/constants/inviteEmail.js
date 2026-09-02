@@ -1,9 +1,8 @@
 // The invitation Rony sends by hand from the BRB Gmail account.
 //
-// It deliberately carries no sign-in link: generating one without sending it
-// needs the Admin SDK server-side, and the browser can only send. So this
-// points people at the portal with their address prefilled, and Firebase's
-// link email arrives as something they're expecting rather than a cold one.
+// It links to /join, where a volunteer sets a password and is straight in.
+// Nothing here touches Firebase's mailer — no magic link, no verification
+// email — so the invisible daily email cap can't break sign-ups.
 
 const PORTAL = 'https://acl.brbcoffee-atx.com'
 
@@ -23,7 +22,9 @@ export function firstNameOf(volunteer) {
 export function buildInviteBody(volunteer) {
   const first = firstNameOf(volunteer)
   const email = volunteer?.email || volunteer?.id || ''
-  const link = `${PORTAL}/?email=${encodeURIComponent(email)}`
+  // The address must match their roster entry exactly — it IS their document
+  // id — so it's carried in the link rather than retyped from memory.
+  const link = `${PORTAL}/join?email=${encodeURIComponent(email)}`
 
   return `Hi ${first},
 
@@ -33,11 +34,13 @@ It's going to be a blast: great music, good energy, and a crew we're excited to 
 
 Here's how to get started:
 
-1. Open the volunteer portal: ${PORTAL}
-2. Hit "Send me a link" — we'll email you a one-click sign-in, no password to set up
+1. Create your account here: ${link}
+2. Pick a password — that's it, there's nothing to confirm and no link to wait for
 3. On the Schedule page, make sure the "Availability" view is selected — it opens there by default
 4. Find your name along the top of the grid, then click every shift you can work across both weekends
 5. That's it — just close the window. Everything saves as you click, there's nothing to submit
+
+Next time, sign in at ${PORTAL} with the same email and password.
 
 We'll build the schedule from everyone's availability, and you'll be able to see exactly where and when you're working. You can update it any time.
 

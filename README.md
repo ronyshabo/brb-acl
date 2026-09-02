@@ -22,17 +22,28 @@ other BRB apps. Full reasoning is in [PLAN.md](PLAN.md).
 
 ## Sign-in
 
-Passwordless, for everyone including admins. Firebase Auth's email-link provider
-sends the mail itself — no SMTP, no SendGrid, no Cloud Function. Enter an email,
-get a link, you're in.
+**Email and password.** No magic links, no verification email, no password to
+set up in advance.
 
-Admin rights hang off the **UID**, not the sign-in method: `isAclAdmin()` checks
-for an `aclAdmins/{uid}` document (or the project's standing `isAdmin()`), so how
-you authenticated is irrelevant to what you can do.
+An invitation is a plain URL — `/join?email=…` — that the admin sends by hand
+from the BRB Gmail using the **Copy** or **Gmail** button on the roster row. The
+volunteer opens it, picks a password, and is in. Nothing in the sign-up path
+touches Firebase's mailer.
 
-There is deliberately no password path. If the email-link provider is ever
-disabled, nobody can sign in — recovery is re-enabling it in the Firebase console,
-under Auth → Sign-in method → Email/Password → "Email link (passwordless sign-in)".
+That is deliberate. Firebase's built-in email sending has a daily cap that is
+**not** listed in the Identity Toolkit quotas (twelve entries, none about email,
+all reading 0% while sends were being refused), cannot be raised, and cannot be
+monitored. An afternoon of testing exhausted it. The only Firebase email left is
+password reset, which is rare — and an admin can also reset a password from the
+Firebase console.
+
+Admin rights hang off the **UID**: `isAclAdmin()` checks for an `aclAdmins/{uid}`
+document, or the project's standing `isAdmin()`. How you authenticated is
+irrelevant to what you can do.
+
+Anyone can reach `/join`, but an account alone grants nothing — the roster gate
+and the Firestore rules both key on being listed in `aclVolunteers`, and a
+volunteer's document id **is** their lowercased email.
 
 ## Firestore
 

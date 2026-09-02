@@ -10,9 +10,9 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import {
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from 'firebase/auth'
 import { db, auth } from './config'
 import { emptyPositions, volunteerIdFor, POSITIONS } from '../constants/schedule'
@@ -199,45 +199,26 @@ export async function resolveAdmin(user) {
   }
 }
 
-/* ── magic link ─────────────────────────────────────────────────────────── */
+/* ── email + password ───────────────────────────────────────────────────── */
 
-const actionCodeSettings = () => ({
-  url: `${window.location.origin}/finish`,
-  handleCodeInApp: true,
-})
+// No magic links and no verification mail. Firebase's built-in mailer has an
+// invisible daily cap that cannot be raised or monitored, and a link that
+// arrives in spam is worse than no link. An invitation is now just a URL the
+// admin sends from their own Gmail; the account is created in the browser.
 
-export async function sendInvite(email) {
-  const clean = volunteerIdFor(email)
-  await sendSignInLinkToEmail(auth, clean, actionCodeSettings())
-  try {
-    window.localStorage.setItem(EMAIL_KEY, clean)
-  } catch {
-    /* private mode — FinishSignIn will prompt for the address instead */
-  }
-}
+export const signIn = (email, password) =>
+  signInWithEmailAndPassword(auth, volunteerIdFor(email), password)
 
-export const isMagicLink = (href = window.location.href) =>
-  isSignInWithEmailLink(auth, href)
+export const createAccount = (email, password) =>
+  createUserWithEmailAndPassword(auth, volunteerIdFor(email), password)
 
-export async function completeSignIn(emailFromPrompt) {
-  let email = emailFromPrompt
-  if (!email) {
-    try {
-      email = window.localStorage.getItem(EMAIL_KEY)
-    } catch {
-      email = null
-    }
-  }
-  if (!email) return { needsEmail: true }
-
-  const cred = await signInWithEmailLink(auth, volunteerIdFor(email), window.location.href)
-  try {
-    window.localStorage.removeItem(EMAIL_KEY)
-  } catch {
-    /* nothing to clean up */
-  }
-  return { user: cred.user }
-}
+/**
+ * The one place Firebase still sends mail. Rare enough not to matter against
+ * the quota, and an admin can also reset a password from the Firebase console
+ * if it ever refuses.
+ */
+export const sendPasswordReset = (email) =>
+  sendPasswordResetEmail(auth, volunteerIdFor(email))
 
 /**
  * First-time link of a Firebase uid to the roster row. The rule only permits

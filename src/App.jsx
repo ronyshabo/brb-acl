@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from './firebase/config'
-import { watchVolunteers, resolveAdmin, linkUid, isMagicLink } from './firebase/data'
+import { watchVolunteers, resolveAdmin, linkUid } from './firebase/data'
 import { volunteerIdFor } from './constants/schedule'
 import Login from './pages/Login'
-import FinishSignIn from './pages/FinishSignIn'
+import JoinPage from './pages/JoinPage'
 import GridPage from './pages/GridPage'
 import StationPage from './pages/StationPage'
 import MenuPage from './pages/MenuPage'
@@ -45,10 +45,17 @@ export default function App() {
 
   if (!authReady) return <div className="boot">Loading…</div>
 
-  // A magic link can land on any path; let FinishSignIn handle it wherever it lands.
-  if (!user && isMagicLink()) return <FinishSignIn />
-
-  if (!user) return <Login />
+  // Signed out: the invitation link points at /join, everything else is sign-in.
+  // Routed rather than read off window.location, so navigating between the two
+  // client-side actually re-renders.
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/join" element={<JoinPage />} />
+        <Route path="*" element={<Login />} />
+      </Routes>
+    )
+  }
 
   if (dataError) {
     return (
@@ -133,7 +140,7 @@ export default function App() {
             path="/admin"
             element={isAdmin ? <AdminPage volunteers={volunteers} /> : <Navigate to="/" replace />}
           />
-          <Route path="/finish" element={<Navigate to="/" replace />} />
+          <Route path="/join" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
