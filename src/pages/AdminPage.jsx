@@ -12,7 +12,13 @@ import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { SLOTS, POSITIONS } from '../constants/schedule'
 import { explainAuthError } from '../firebase/authErrors'
-import { INVITE_SUBJECT, buildInviteBody, gmailComposeUrl } from '../constants/inviteEmail'
+import {
+  INVITE_SUBJECT,
+  buildInviteBody,
+  gmailComposeUrl,
+  teamEmailUrl,
+  addressesOf,
+} from '../constants/inviteEmail'
 import '../styles/admin.css'
 
 export default function AdminPage({ volunteers }) {
@@ -83,6 +89,16 @@ export default function AdminPage({ volunteers }) {
       setStatus({ ok: true, text: `Invite for ${v.name || v.id} copied — paste it into Gmail.` })
     } catch {
       setStatus({ ok: false, text: 'Clipboard blocked by the browser. Use the Gmail button instead.' })
+    }
+  }
+
+  async function copyAddresses() {
+    const list = addressesOf(volunteers).join(', ')
+    try {
+      await navigator.clipboard.writeText(list)
+      setStatus({ ok: true, text: `Copied ${volunteers.length} addresses — paste into the BCC field.` })
+    } catch {
+      setStatus({ ok: false, text: 'Clipboard blocked by the browser. Use Export CSV instead.' })
     }
   }
 
@@ -160,6 +176,19 @@ export default function AdminPage({ volunteers }) {
         <div className="panelhead">
           <h3>Roster · {volunteers.length}</h3>
           <div className="acts">
+            <a
+              className="btn"
+              href={volunteers.length ? teamEmailUrl(volunteers) : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-disabled={!volunteers.length}
+              title="Gmail compose to the whole roster, BCC'd"
+            >
+              Email everyone
+            </a>
+            <button onClick={copyAddresses} disabled={!volunteers.length}>
+              Copy addresses
+            </button>
             <button onClick={exportCsv}>Export CSV</button>
             <button className={config.locked ? 'locked' : ''} onClick={toggleLock}>
               {config.locked ? 'Unlock schedule' : 'Lock schedule'}

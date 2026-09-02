@@ -123,3 +123,16 @@ table.roster td.mono { font-family: var(--font-mono); font-size: 12px; color: va
 
   .preview pre { font-size: 12px; max-height: 240px; }
 }
+
+/* "Email everyone" is a link (Gmail compose), styled to match the buttons. */
+.acts a.btn {
+  display: inline-block; text-decoration: none; text-align: center;
+  font-family: var(--font-pixel); font-size: 8px; color: var(--ink);
+  background: var(--gold);
+  border: 2px solid var(--bevel-dark); border-top-color: #fff; border-left-color: #fff;
+  padding: 6px 12px;
+}
+.acts a.btn:active {
+  border-color: #fff; border-top-color: var(--bevel-dark); border-left-color: var(--bevel-dark);
+}
+.acts a.btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }

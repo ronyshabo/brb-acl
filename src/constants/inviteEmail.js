@@ -68,3 +68,31 @@ export function gmailComposeUrl(volunteer) {
   })
   return `https://mail.google.com/mail/?${p.toString()}`
 }
+
+/* ── emailing the whole team ─────────────────────────────────────────────── */
+
+export const addressesOf = (volunteers) =>
+  volunteers.map((v) => v.email || v.id).filter(Boolean)
+
+export const TEAM_SUBJECT = 'BRB Coffee — ACL volunteers'
+
+/**
+ * Gmail compose addressed to the whole roster.
+ *
+ * BCC, not To. A group mail to forty volunteers in the To field hands every
+ * address to every recipient, and most of these people don't know each other.
+ * BCC gets the reach without publishing the roster.
+ */
+export function teamEmailUrl(volunteers) {
+  const p = new URLSearchParams({
+    view: 'cm',
+    fs: '1',
+    bcc: addressesOf(volunteers).join(','),
+    su: TEAM_SUBJECT,
+    body: `Hi all,
+
+— BRB Coffee
+${PORTAL}`,
+  })
+  return `https://mail.google.com/mail/?${p.toString()}`
+}
