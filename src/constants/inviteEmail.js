@@ -24,7 +24,12 @@ export function buildInviteBody(volunteer) {
   const email = volunteer?.email || volunteer?.id || ''
   // The address must match their roster entry exactly — it IS their document
   // id — so it's carried in the link rather than retyped from memory.
-  const link = `${PORTAL}/join?email=${encodeURIComponent(email)}`
+  //
+  // '@' is legal unencoded in a query string, and %40 makes the URL look
+  // mangled in an email, which is the last thing a cold invitation needs.
+  // Everything else stays encoded — '+' especially, which some parsers read
+  // as a space and would break plus-addressed gmail accounts.
+  const link = `${PORTAL}/join?email=${encodeURIComponent(email).replace(/%40/g, '@')}`
 
   return `Hi ${first},
 
