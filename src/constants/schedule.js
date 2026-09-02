@@ -26,16 +26,28 @@ export const HEADCOUNT = POSITIONS.length
 
 export const slotId = (date, shift) => `${date}_${shift}`
 
-/** All 12 slots, in the order they happen. */
-export const SLOTS = DAYS.flatMap((day) =>
-  SHIFTS.map((shift) => ({
-    id: slotId(day.date, shift.id),
-    date: day.date,
-    shift: shift.id,
-    day,
-    shiftMeta: shift,
-  }))
-)
+const makeSlot = (day, shift) => ({
+  id: slotId(day.date, shift.id),
+  date: day.date,
+  shift: shift.id,
+  day,
+  shiftMeta: shift,
+})
+
+/**
+ * All 12 slots in the order they happen. This is the canonical order — the
+ * station tab steps through it one shift at a time, and Friday night should
+ * follow Friday afternoon.
+ */
+export const SLOTS = DAYS.flatMap((day) => SHIFTS.map((shift) => makeSlot(day, shift)))
+
+/**
+ * The same 12 slots grouped by shift: all six afternoons, then all six
+ * evenings. This is how the grid reads its columns — comparing who can work
+ * afternoons is a different question from what happens on Friday, and the
+ * grid is where that comparison gets made.
+ */
+export const SLOTS_BY_SHIFT = SHIFTS.flatMap((shift) => DAYS.map((day) => makeSlot(day, shift)))
 
 export const emptyPositions = () =>
   Object.fromEntries(POSITIONS.map((p) => [p.id, null]))

@@ -69,8 +69,10 @@ th.rowhead b {
 th.rowhead em { font-style: normal; color: var(--error-border); }
 tr.self th.rowhead { background: var(--gold); }
 
-/* the weekend split is a vertical rule now */
-table.grid .weekend-break { border-left: 3px solid #000; }
+/* Columns run six afternoons then six evenings. Heavy rule between the two
+   shift blocks, lighter one between the weekends inside each block. */
+table.grid .shift-break   { border-left: 4px solid #000; }
+table.grid .weekend-break { border-left: 2px solid var(--bevel-dark); }
 
 .cell {
   display: block; width: 100%; height: 38px; overflow: hidden;

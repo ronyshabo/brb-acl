@@ -1,4 +1,4 @@
-import { SLOTS, POSITIONS, HEADCOUNT } from '../constants/schedule'
+import { SLOTS_BY_SHIFT, POSITIONS, HEADCOUNT } from '../constants/schedule'
 
 /**
  * Volunteers down the rows, the 12 day+shift slots across the columns.
@@ -31,8 +31,15 @@ export default function ShiftGrid({
   const filledCount = (slot) =>
     POSITIONS.filter((p) => (assignments[slot] || {})[p.id]).length
 
-  /** First slot of the second weekend, for the divider. */
-  const breaksAt = (i) => i > 0 && SLOTS[i].day.weekend !== SLOTS[i - 1].day.weekend
+  // Columns are grouped by shift: six afternoons, then six evenings. A heavy
+  // rule separates the two blocks, a lighter one the two weekends inside each.
+  const cols = SLOTS_BY_SHIFT
+  const dividerAt = (i) => {
+    if (i === 0) return ''
+    if (cols[i].shift !== cols[i - 1].shift) return 'shift-break'
+    if (cols[i].day.weekend !== cols[i - 1].day.weekend) return 'weekend-break'
+    return ''
+  }
 
   function cellClick(slot, volunteer) {
     const mine = me && volunteer.id === me.id
@@ -58,12 +65,12 @@ export default function ShiftGrid({
             <th className="corner">
               {layer === 'availability' ? 'Who’s free' : 'Who’s on'}
             </th>
-            {SLOTS.map((slot, i) => (
+            {cols.map((slot, i) => (
               <th
                 key={slot.id}
                 className={[
                   slot.shift === '12-17' ? 'day' : 'night',
-                  breaksAt(i) ? 'weekend-break' : '',
+                  dividerAt(i),
                 ].filter(Boolean).join(' ')}
                 title={`${slot.day.dow} ${slot.day.short} · ${slot.shiftMeta.label}`}
               >
@@ -85,7 +92,7 @@ export default function ShiftGrid({
                   {v.status !== 'active' && <em title="Hasn’t created an account yet">•</em>}
                 </th>
 
-                {SLOTS.map((slot, i) => {
+                {cols.map((slot, i) => {
                   const free = !!(availability[v.id] || {})[slot.id]
                   const pos = positionOf(slot.id, v.id)
                   const conflict = !!pos && !free
@@ -104,7 +111,7 @@ export default function ShiftGrid({
                       : isAdmin || (mine && !!pos)
 
                   return (
-                    <td key={slot.id} className={breaksAt(i) ? 'weekend-break' : ''}>
+                    <td key={slot.id} className={dividerAt(i)}>
                       <button
                         type="button"
                         className={cls}
@@ -132,12 +139,12 @@ export default function ShiftGrid({
         <tfoot>
           <tr>
             <th className="corner">Filled</th>
-            {SLOTS.map((slot, i) => {
+            {cols.map((slot, i) => {
               const filled = filledCount(slot.id)
               return (
                 <td
                   key={slot.id}
-                  className={`cover ${breaksAt(i) ? 'weekend-break' : ''}`}
+                  className={`cover ${dividerAt(i)}`}
                 >
                   <span className={filled < HEADCOUNT ? 'short' : 'ok'}>
                     {filled}/{HEADCOUNT}
