@@ -17,49 +17,60 @@
 }
 .layerbar .tip { font-family: var(--font-ui); font-size: 12px; color: var(--ink-mute); }
 
-/* ── the grid ────────────────────────────────────────────────────────────── */
+/* ── the grid ────────────────────────────────────────────────────────────
+   Volunteers down the rows, 12 day+shift slots across. table-layout:fixed so a
+   cell gaining a check mark can't change any column width. */
 .grid-scroll {
   overflow: auto; max-height: 70vh;
   background: var(--window); border: 2px solid #000;
 }
-/* table-layout:fixed is the fix for cells resizing as you click.
-   With auto layout a cell gaining a check mark widens its column and the
-   whole table reflows; with fixed, content never affects geometry. */
 table.grid {
   border-collapse: separate; border-spacing: 0;
   table-layout: fixed; width: max-content; min-width: 100%;
 }
 table.grid th, table.grid td { padding: 0; border-bottom: 1px solid var(--silver); }
-table.grid th.corner, table.grid th.rowhead { width: 118px; }
-table.grid thead th { width: 58px; }
-table.grid th.cover, table.grid td.cover { width: 62px; }
+table.grid th.corner, table.grid th.rowhead { width: 152px; }
+table.grid thead th:not(.corner) { width: 66px; }
 
+/* header: day over date over shift */
 table.grid thead th {
   position: sticky; top: 0; z-index: 3;
   background: var(--silver-light); color: var(--ink);
-  font-family: var(--font-ui); font-size: 12px; font-weight: bold;
-  padding: 8px 7px; text-align: center; white-space: nowrap;
+  padding: 6px 3px; text-align: center; vertical-align: bottom;
   border-bottom: 2px solid #000; box-shadow: var(--raised);
 }
-table.grid thead th.self { color: var(--heading); }
-table.grid thead th em { font-style: normal; color: var(--error-border); margin-left: 3px; }
+table.grid thead th b {
+  display: block; font-family: var(--font-pixel); font-size: 8px; line-height: 1.6;
+}
+table.grid thead th .date {
+  display: block; font-family: var(--font-mono); font-size: 11px; font-weight: bold;
+}
+table.grid thead th .shift {
+  display: block; font-family: var(--font-mono); font-size: 10px;
+}
+table.grid thead th.day .shift   { color: var(--heading); }
+table.grid thead th.night .shift { color: var(--link); }
+
 table.grid th.corner {
-  left: 0; z-index: 4; text-align: left; padding-left: 10px; min-width: 116px;
-  font-family: var(--font-pixel); font-size: 8px;
+  left: 0; z-index: 4; text-align: left; padding-left: 10px;
+  font-family: var(--font-pixel); font-size: 8px; vertical-align: middle;
 }
 table.grid th.corner, table.grid th.rowhead { position: sticky; left: 0; }
 
+/* rows are people now */
 th.rowhead {
   z-index: 2; background: var(--paper); text-align: left;
-  padding: 7px 10px; min-width: 116px;
-  border-right: 2px solid #000; box-shadow: var(--raised);
+  padding: 7px 10px; border-right: 2px solid #000; box-shadow: var(--raised);
 }
-th.rowhead b { display: block; font-family: var(--font-ui); font-size: 12.5px; }
-th.rowhead span { font-family: var(--font-mono); font-size: 11.5px; font-weight: bold; }
-th.rowhead.day span   { color: var(--heading); }
-th.rowhead.night span { color: var(--link); }
+th.rowhead b {
+  font-family: var(--font-ui); font-size: 13px; font-weight: bold;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
+}
+th.rowhead em { font-style: normal; color: var(--error-border); }
+tr.self th.rowhead { background: var(--gold); }
 
-tr.weekend-break th, tr.weekend-break td { border-top: 3px solid #000; }
+/* the weekend split is a vertical rule now */
+table.grid .weekend-break { border-left: 3px solid #000; }
 
 .cell {
   display: block; width: 100%; height: 38px; overflow: hidden;
@@ -76,15 +87,19 @@ tr.weekend-break th, tr.weekend-break td { border-top: 3px solid #000; }
 }
 .cell.on       { background: var(--info-bg); color: var(--info-text); box-shadow: var(--raised); }
 .cell.conflict { background: var(--error-bg); color: var(--error-text); box-shadow: 0 0 0 2px var(--error-border) inset; }
-.cell.mine     { box-shadow: 3px 0 0 var(--accent) inset; }
-.cell.mine.on  { box-shadow: 3px 0 0 var(--accent) inset, var(--raised); }
-.cell.mine.conflict { box-shadow: 0 0 0 2px var(--error-border) inset; }
 .cell:not(:disabled):hover { filter: brightness(.94); }
 .cell .flag { position: absolute; top: 1px; right: 3px; font-size: 11px; }
 
-td.cover, th.cover {
-  text-align: center; padding: 0 9px;
-  font-family: var(--font-mono); font-size: 12.5px; font-weight: bold;
+/* coverage is a footer row */
+table.grid tfoot th, table.grid tfoot td {
+  position: sticky; bottom: 0; z-index: 3;
+  background: var(--silver-light); border-top: 2px solid #000;
+  box-shadow: var(--raised);
+}
+table.grid tfoot th.corner { z-index: 4; }
+td.cover {
+  text-align: center; padding: 6px 2px;
+  font-family: var(--font-mono); font-size: 12px; font-weight: bold;
 }
 td.cover .short { color: var(--error-text); }
 td.cover .ok    { color: var(--success-text); }
@@ -102,7 +117,7 @@ td.cover .ok    { color: var(--success-text); }
 .legend .sw.free     { background: var(--success-bg); border-color: var(--success-border); }
 .legend .sw.on       { background: var(--info-bg);    border-color: var(--link); }
 .legend .sw.conflict { background: var(--error-bg);   border-color: var(--error-border); }
-.legend .codes { font-family: var(--font-mono); font-weight: bold; }
+.legend .codes { font-family: var(--font-mono); font-weight: bold; flex-basis: 100%; }
 
 .conflicts {
   margin: 0 12px; padding-left: 16px;
@@ -119,15 +134,15 @@ td.cover .ok    { color: var(--success-text); }
   .gridpage { gap: 10px; }
   .grid-scroll { max-height: 62vh; }
 
-  table.grid th.corner, table.grid th.rowhead { width: 92px; }
-  table.grid thead th { width: 50px; }
-  table.grid th.cover, table.grid td.cover { width: 52px; }
+  table.grid th.corner, table.grid th.rowhead { width: 116px; }
+  table.grid thead th:not(.corner) { width: 56px; }
 
-  table.grid thead th { font-size: 11px; padding: 7px 4px; }
+  table.grid thead th b { font-size: 7px; }
+  table.grid thead th .date { font-size: 10px; }
+  table.grid thead th .shift { font-size: 9px; }
   table.grid th.corner { font-size: 7px; }
-  th.rowhead { padding: 6px 7px; }
-  th.rowhead b { font-size: 11.5px; }
-  th.rowhead span { font-size: 10.5px; }
+  th.rowhead { padding: 6px 8px; }
+  th.rowhead b { font-size: 12px; }
 
   .cell { height: 42px; font-size: 12px; }   /* taller = easier to tap */
 

@@ -1,7 +1,11 @@
 import { SLOTS, POSITIONS, HEADCOUNT } from '../constants/schedule'
 
 /**
- * 12 slot rows × volunteer columns.
+ * Volunteers down the rows, the 12 day+shift slots across the columns.
+ *
+ * The slot count is fixed at 12 and the roster grows, so this puts the bounded
+ * axis on the horizontal — the grid gets taller with more people rather than
+ * wider, and vertical scrolling is the one phones do well.
  *
  * Availability and assignment are separate stored layers, so a cell can be
  * "assigned but no longer available" — that's the conflict state, and it is the
@@ -21,12 +25,14 @@ export default function ShiftGrid({
 }) {
   const positionOf = (slot, volunteerId) => {
     const row = assignments[slot] || {}
-    const hit = POSITIONS.find((p) => row[p.id] === volunteerId)
-    return hit || null
+    return POSITIONS.find((p) => row[p.id] === volunteerId) || null
   }
 
   const filledCount = (slot) =>
     POSITIONS.filter((p) => (assignments[slot] || {})[p.id]).length
+
+  /** First slot of the second weekend, for the divider. */
+  const breaksAt = (i) => i > 0 && SLOTS[i].day.weekend !== SLOTS[i - 1].day.weekend
 
   function cellClick(slot, volunteer) {
     const mine = me && volunteer.id === me.id
@@ -52,31 +58,37 @@ export default function ShiftGrid({
             <th className="corner">
               {layer === 'availability' ? 'Who’s free' : 'Who’s on'}
             </th>
-            {volunteers.map((v) => (
-              <th key={v.id} className={me && v.id === me.id ? 'self' : ''}>
-                <span>{v.name || v.email}</span>
-                {v.status === 'invited' && <em title="Invite not yet claimed">•</em>}
+            {SLOTS.map((slot, i) => (
+              <th
+                key={slot.id}
+                className={[
+                  slot.shift === '12-17' ? 'day' : 'night',
+                  breaksAt(i) ? 'weekend-break' : '',
+                ].filter(Boolean).join(' ')}
+                title={`${slot.day.dow} ${slot.day.short} · ${slot.shiftMeta.label}`}
+              >
+                <b>{slot.day.dow}</b>
+                <span className="date">{slot.day.short}</span>
+                <span className="shift">{slot.shiftMeta.label}</span>
               </th>
             ))}
-            <th className="cover">Filled</th>
           </tr>
         </thead>
+
         <tbody>
-          {SLOTS.map((slot, i) => {
-            const newWeekend = i > 0 && slot.day.weekend !== SLOTS[i - 1].day.weekend
-            const filled = filledCount(slot.id)
+          {volunteers.map((v) => {
+            const mine = me && v.id === me.id
             return (
-              <tr key={slot.id} className={newWeekend ? 'weekend-break' : ''}>
-                <th className={`rowhead ${slot.shift === '12-17' ? 'day' : 'night'}`}>
-                  <b>{slot.day.dow} {slot.day.short}</b>
-                  <span>{slot.shiftMeta.label}</span>
+              <tr key={v.id} className={mine ? 'self' : ''}>
+                <th className="rowhead">
+                  <b>{v.name || v.email}</b>
+                  {v.status !== 'active' && <em title="Hasn’t created an account yet">•</em>}
                 </th>
 
-                {volunteers.map((v) => {
+                {SLOTS.map((slot, i) => {
                   const free = !!(availability[v.id] || {})[slot.id]
                   const pos = positionOf(slot.id, v.id)
                   const conflict = !!pos && !free
-                  const mine = me && v.id === me.id
 
                   const cls = [
                     'cell',
@@ -84,7 +96,6 @@ export default function ShiftGrid({
                     layer === 'assignment' && pos ? 'on' : '',
                     layer === 'assignment' && !pos && free ? 'candidate' : '',
                     conflict ? 'conflict' : '',
-                    mine ? 'mine' : '',
                   ].filter(Boolean).join(' ')
 
                   const editable =
@@ -93,7 +104,7 @@ export default function ShiftGrid({
                       : isAdmin || (mine && !!pos)
 
                   return (
-                    <td key={v.id}>
+                    <td key={slot.id} className={breaksAt(i) ? 'weekend-break' : ''}>
                       <button
                         type="button"
                         className={cls}
@@ -113,16 +124,29 @@ export default function ShiftGrid({
                     </td>
                   )
                 })}
-
-                <td className="cover">
-                  <span className={filled < HEADCOUNT ? 'short' : 'ok'}>
-                    {filled}/{HEADCOUNT}
-                  </span>
-                </td>
               </tr>
             )
           })}
         </tbody>
+
+        <tfoot>
+          <tr>
+            <th className="corner">Filled</th>
+            {SLOTS.map((slot, i) => {
+              const filled = filledCount(slot.id)
+              return (
+                <td
+                  key={slot.id}
+                  className={`cover ${breaksAt(i) ? 'weekend-break' : ''}`}
+                >
+                  <span className={filled < HEADCOUNT ? 'short' : 'ok'}>
+                    {filled}/{HEADCOUNT}
+                  </span>
+                </td>
+              )
+            })}
+          </tr>
+        </tfoot>
       </table>
     </div>
   )
