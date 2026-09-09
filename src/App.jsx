@@ -45,6 +45,24 @@ export default function App() {
     if (me && !me.uid && user) linkUid(me.id, user.uid).catch(() => {})
   }, [me, user])
 
+  // Someone signed in with no roster row at all — they weren't invited, so add
+  // them. Invited volunteers never reach this: their row already exists and the
+  // effect above just claims it, leaving the name the admin typed intact.
+  //
+  // Admins are skipped; one who isn't working shifts shouldn't take a row in
+  // the grid.
+  useEffect(() => {
+    if (!user || isAdmin || me || volunteers === null || joining) return
+    setJoining(true)
+    selfRegisterVolunteer(user).catch((err) =>
+      setJoinError(
+        err?.code === 'permission-denied'
+          ? 'The rules that let volunteers add themselves aren’t deployed yet.'
+          : `Firestore said: ${err?.code || 'unknown error'}.`
+      )
+    )
+  }, [user, isAdmin, me, volunteers, joining])
+
   if (!authReady) return <div className="boot">Loading…</div>
 
   // Signed out: the invitation link points at /join, everything else is sign-in.
@@ -80,9 +98,6 @@ export default function App() {
 
   if (volunteers === null) return <div className="boot">Loading roster…</div>
 
-  // Signed in with no roster row: add one. Anyone who can sign up is a
-  // volunteer — the roster is not a guest list. Admins are skipped, since an
-  // admin who isn't working shifts has no business taking a column in the grid.
   if (!me && !isAdmin) {
     if (joinError) {
       return (
@@ -90,19 +105,9 @@ export default function App() {
           <h1>Couldn’t add you to the roster</h1>
           <p>{joinError}</p>
           <p className="hint">Signed in as <b>{user.email}</b>.</p>
-          <button onClick={() => { setJoinError(null); window.location.reload() }}>Try again</button>
+          <button onClick={() => window.location.reload()}>Try again</button>
           <button onClick={() => signOut(auth)}>Sign out</button>
         </div>
-      )
-    }
-    if (!joining) {
-      setJoining(true)
-      selfRegisterVolunteer(user).catch((err) =>
-        setJoinError(
-          err?.code === 'permission-denied'
-            ? 'The rules that let volunteers add themselves aren’t deployed yet.'
-            : `Firestore said: ${err?.code || 'unknown error'}.`
-        )
       )
     }
     return <div className="boot">Setting up your spot…</div>

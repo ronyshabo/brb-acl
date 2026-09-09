@@ -66,7 +66,6 @@ export default function JoinPage() {
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
           autoComplete="name"
-          required
         />
         <input
           type="email"
@@ -99,13 +98,14 @@ export default function JoinPage() {
 
         <button
           type="submit"
-          disabled={busy || !name || !email || password.length < 6 || password !== confirm}
+          disabled={busy || !email || password.length < 6 || password !== confirm}
         >
           {busy ? 'Creating…' : 'Create account'}
         </button>
 
         <p className="quiet">
-          Your name is how you’ll appear on the schedule. Already have an account?{' '}
+          If you were invited, we already have your name — just set a password. Otherwise
+          add your name above and you’ll be added to the roster. Already have an account?{' '}
           <Link to="/">Sign in</Link>.
         </p>
       </form>
