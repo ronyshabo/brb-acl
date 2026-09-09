@@ -78,35 +78,26 @@ export default function App() {
 
   if (volunteers === null) return <div className="boot">Loading roster…</div>
 
+  // Signed in but not on the roster. This is where a volunteer lands if they
+  // signed up with a different address than the one they were invited at —
+  // the roster document id IS the lowercased email, so it has to match.
+  //
+  // Deliberately says nothing about admin access. Admins are granted by
+  // creating aclAdmins/{uid} in the Firebase console, and this screen is seen
+  // by strangers.
   if (!me && !isAdmin) {
     return (
       <div className="gate">
-        <h1>Not on the list</h1>
+        <h1>We don’t have you on the list</h1>
         <p>
-          <b>{user.email}</b> isn’t on the ACL volunteer roster. If that’s wrong, ask
-          whoever invited you to add this exact address.
+          You’re signed in as <b>{user.email}</b>, but that address isn’t on the ACL
+          volunteer roster.
         </p>
-
-        {/*
-          Bootstrapping the first admin: aclAdmins/{uid} can't exist before a uid
-          does, so the very first sign-in always lands here. Show the uid rather
-          than dead-ending on it.
-        */}
-        <details className="bootstrap" open>
-          <summary>Setting yourself up as an admin?</summary>
-          <p>
-            Create a document in Firestore at <code>aclAdmins</code> with this as the
-            document ID, then hard-reload this page. Any fields, or none.
-          </p>
-          <code className="uid">{user.uid}</code>
-          <button
-            className="copy"
-            onClick={() => navigator.clipboard?.writeText(user.uid)}
-          >
-            Copy uid
-          </button>
-        </details>
-
+        <p className="hint">
+          If you were invited at a different address, sign out and sign up again with
+          the exact one your invitation was sent to. Otherwise ask whoever invited you
+          to add this address to the roster.
+        </p>
         <button onClick={() => signOut(auth)}>Sign out</button>
       </div>
     )

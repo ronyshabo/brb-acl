@@ -178,21 +178,6 @@ main {
 .panel p.warn { color: var(--error-text); font-weight: bold; }
 .panel p.good { color: var(--success-text); font-weight: bold; }
 
-/* first-admin bootstrap on the gate screen */
-.gate .bootstrap {
-  background: var(--window); border: 2px solid #000;
-  padding: 12px 14px; max-width: 46ch; text-align: left;
-}
-.gate .bootstrap summary {
-  font-family: var(--font-pixel); font-size: 9px; cursor: pointer; color: var(--heading);
-}
-.gate .bootstrap p { color: var(--ink); font-size: 13px; margin: 10px 0; }
-.gate .bootstrap .uid {
-  display: block; background: var(--info-bg); color: var(--info-text);
-  padding: 8px 10px; word-break: break-all; margin-bottom: 8px;
-  box-shadow: var(--sunken);
-}
-
 /* ── phone ───────────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   body { font-size: 13.5px; }
@@ -219,7 +204,6 @@ main {
 
   .gate h1 { font-size: 12px; }
   .gate p { font-size: 13px; }
-  .gate .bootstrap { max-width: 100%; }
 
   /* Comfortable tap targets everywhere. */
   button { padding: 9px 12px; }
