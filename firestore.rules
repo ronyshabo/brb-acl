@@ -38,12 +38,22 @@ service cloud.firestore {
 
     match /aclVolunteers/{id} {
       allow read: if isSignedIn();
-      allow create, delete: if isAclAdmin();
+      allow delete: if isAclAdmin();
+
+      allow create: if isAclAdmin()
+        || (id == myVolunteerId()
+            && request.resource.data.email == id
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.status == 'active'
+            && request.resource.data.keys().hasOnly([
+                 'name', 'email', 'phone', 'status', 'uid',
+                 'invitedAt', 'claimedAt', 'selfSignup', 'notes'
+               ]));
+
       allow update: if isAclAdmin()
         // First-time uid link only, by the person whose email it is.
-        // `!('uid' in ...)` first: reading an absent field errors, and an
-        // erroring rule denies — which would lock out any volunteer whose
-        // doc was created by hand without a uid field.
+        // Check absence before value: reading a missing field errors, and an
+        // erroring rule denies.
         || ((!('uid' in resource.data) || resource.data.uid == null)
             && id == myVolunteerId()
             && request.resource.data.diff(resource.data).affectedKeys()

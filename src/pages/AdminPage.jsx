@@ -210,6 +210,7 @@ export default function AdminPage({ volunteers }) {
                       : v.status === 'invited' ? 'invited'
                       : 'not invited'}
                   </span>
+                  {v.selfSignup && <span className="pill self" title="Added themselves, not invited">signed up</span>}
                 </td>
                 <td className="rowacts" data-label="Actions">
                   <button onClick={() => copyInvite(v)} title="Copy the invitation text">

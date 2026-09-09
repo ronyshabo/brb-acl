@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from './firebase/config'
-import { watchVolunteers, resolveAdmin, linkUid } from './firebase/data'
+import { watchVolunteers, resolveAdmin, linkUid, selfRegisterVolunteer } from './firebase/data'
 import { volunteerIdFor } from './constants/schedule'
 import Login from './pages/Login'
 import JoinPage from './pages/JoinPage'
@@ -17,6 +17,8 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [authReady, setAuthReady] = useState(false)
   const [dataError, setDataError] = useState(null)
+  const [joining, setJoining] = useState(false)
+  const [joinError, setJoinError] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => onAuthStateChanged(auth, (u) => {
@@ -78,29 +80,32 @@ export default function App() {
 
   if (volunteers === null) return <div className="boot">Loading roster…</div>
 
-  // Signed in but not on the roster. This is where a volunteer lands if they
-  // signed up with a different address than the one they were invited at —
-  // the roster document id IS the lowercased email, so it has to match.
-  //
-  // Deliberately says nothing about admin access. Admins are granted by
-  // creating aclAdmins/{uid} in the Firebase console, and this screen is seen
-  // by strangers.
+  // Signed in with no roster row: add one. Anyone who can sign up is a
+  // volunteer — the roster is not a guest list. Admins are skipped, since an
+  // admin who isn't working shifts has no business taking a column in the grid.
   if (!me && !isAdmin) {
-    return (
-      <div className="gate">
-        <h1>We don’t have you on the list</h1>
-        <p>
-          You’re signed in as <b>{user.email}</b>, but that address isn’t on the ACL
-          volunteer roster.
-        </p>
-        <p className="hint">
-          If you were invited at a different address, sign out and sign up again with
-          the exact one your invitation was sent to. Otherwise ask whoever invited you
-          to add this address to the roster.
-        </p>
-        <button onClick={() => signOut(auth)}>Sign out</button>
-      </div>
-    )
+    if (joinError) {
+      return (
+        <div className="gate">
+          <h1>Couldn’t add you to the roster</h1>
+          <p>{joinError}</p>
+          <p className="hint">Signed in as <b>{user.email}</b>.</p>
+          <button onClick={() => { setJoinError(null); window.location.reload() }}>Try again</button>
+          <button onClick={() => signOut(auth)}>Sign out</button>
+        </div>
+      )
+    }
+    if (!joining) {
+      setJoining(true)
+      selfRegisterVolunteer(user).catch((err) =>
+        setJoinError(
+          err?.code === 'permission-denied'
+            ? 'The rules that let volunteers add themselves aren’t deployed yet.'
+            : `Firestore said: ${err?.code || 'unknown error'}.`
+        )
+      )
+    }
+    return <div className="boot">Setting up your spot…</div>
   }
 
   return (

@@ -13,6 +13,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  updateProfile,
 } from 'firebase/auth'
 import { db, auth } from './config'
 import { emptyPositions, volunteerIdFor, POSITIONS } from '../constants/schedule'
@@ -209,8 +210,44 @@ export async function resolveAdmin(user) {
 export const signIn = (email, password) =>
   signInWithEmailAndPassword(auth, volunteerIdFor(email), password)
 
-export const createAccount = (email, password) =>
-  createUserWithEmailAndPassword(auth, volunteerIdFor(email), password)
+export async function createAccount(email, password, name = '') {
+  const cred = await createUserWithEmailAndPassword(auth, volunteerIdFor(email), password)
+  // Carried on the auth profile so App can put a real name on the roster row
+  // it creates, rather than guessing one from the address.
+  if (name.trim()) await updateProfile(cred.user, { displayName: name.trim() })
+  return cred
+}
+
+/** "maya.ortiz@gmail.com" -> "Maya Ortiz" — a last resort, not a good name. */
+function nameFromEmail(email) {
+  return (email || '').split('@')[0]
+    .split(/[._\-+0-9]+/).filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ') || 'Volunteer'
+}
+
+/**
+ * Puts a signed-in person on the roster themselves.
+ *
+ * Anyone who can sign up gets in — there is no invitation check. The rules
+ * allow this only for a document whose id is the signer's own email, carrying
+ * their own uid, so nobody can create or claim a row that isn't theirs.
+ */
+export async function selfRegisterVolunteer(user) {
+  const id = volunteerIdFor(user.email)
+  await setDoc(doc(db, 'aclVolunteers', id), {
+    name: user.displayName?.trim() || nameFromEmail(user.email),
+    email: id,
+    phone: '',
+    status: 'active',
+    uid: user.uid,
+    invitedAt: null,
+    claimedAt: serverTimestamp(),
+    selfSignup: true,
+    notes: '',
+  })
+  return id
+}
 
 /**
  * The one place Firebase still sends mail. Rare enough not to matter against

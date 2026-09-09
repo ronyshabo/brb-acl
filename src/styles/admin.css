@@ -136,3 +136,4 @@ table.roster td.mono { font-family: var(--font-mono); font-size: 12px; color: va
   border-color: #fff; border-top-color: var(--bevel-dark); border-left-color: var(--bevel-dark);
 }
 .acts a.btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+.pill.self { background: var(--warm-glow); color: var(--heading); border-color: var(--heading); margin-left: 5px; }

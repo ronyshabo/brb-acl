@@ -24,6 +24,7 @@ export default function JoinPage() {
       return ''
     }
   })
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState(null)
@@ -42,7 +43,7 @@ export default function JoinPage() {
     setBusy(true)
     setError(null)
     try {
-      await createAccount(email, password)   // App links the uid to the roster row
+      await createAccount(email, password, name)   // App puts them on the roster
     } catch (err) {
       setError(explainAuthError(err))
     } finally {
@@ -59,6 +60,14 @@ export default function JoinPage() {
           Pick a password and you’re in. Nothing to confirm, no link to wait for.
         </p>
 
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name"
+          autoComplete="name"
+          required
+        />
         <input
           type="email"
           value={email}
@@ -90,14 +99,14 @@ export default function JoinPage() {
 
         <button
           type="submit"
-          disabled={busy || !email || password.length < 6 || password !== confirm}
+          disabled={busy || !name || !email || password.length < 6 || password !== confirm}
         >
           {busy ? 'Creating…' : 'Create account'}
         </button>
 
         <p className="quiet">
-          Use the same email your invitation was sent to — that’s how we match you to
-          the roster. Already set a password? <Link to="/">Sign in</Link>.
+          Your name is how you’ll appear on the schedule. Already have an account?{' '}
+          <Link to="/">Sign in</Link>.
         </p>
       </form>
     </div>
