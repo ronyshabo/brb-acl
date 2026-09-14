@@ -84,6 +84,12 @@ service cloud.firestore {
             && dropOk('back-left')  && dropOk('back-right'));
     }
 
+    // Read-only view of brb-schedule's rota, so ACL admins can see who is
+    // already committed at the shop on fest days. No write access.
+    match /schedules/{id} {
+      allow read: if isAclAdmin();
+    }
+
     match /aclDropLog/{id} {
       allow read: if isAclAdmin();
       allow create: if isSignedIn()

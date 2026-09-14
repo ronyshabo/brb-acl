@@ -1,5 +1,7 @@
 import {
   collection,
+  query,
+  where,
   doc,
   onSnapshot,
   setDoc,
@@ -108,6 +110,26 @@ export async function dropPosition(slot, positionId, volunteerId, reason = '') {
     at: serverTimestamp(),
   })
 }
+
+/* ── the shop (brb-schedule's data, read-only) ──────────────────────────── */
+
+// Barista shifts live in the `schedules` collection that brb-schedule owns:
+// { date, shiftType: 'opening'|'closing'|'shared', baristaId (a uid), baristaName }.
+// We only ever read it, and only for October.
+
+export const watchShopShifts = (cb, onError) =>
+  onSnapshot(
+    query(collection(db, 'schedules'), where('month', '==', '2026-10')),
+    (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    onError
+  )
+
+export const watchBaristas = (cb, onError) =>
+  onSnapshot(
+    collection(db, 'baristas'),
+    (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    onError
+  )
 
 /* ── menu ───────────────────────────────────────────────────────────────── */
 
